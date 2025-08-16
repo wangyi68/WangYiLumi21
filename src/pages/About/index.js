@@ -70,7 +70,7 @@ function About() {
                   <FontAwesomeIcon icon={faSchool} />
                 </div>
                 <div className='flex-1'>
-                  <h5 className='text-sm'>牟德中学 2</h5>
+                  <h5 className='text-sm'>SeiRei Student</h5>
                   <div className='flex justify-between text-xs text-slate-700'>
                     <p>普通学生</p>
                     <p>201x - 202x</p>
@@ -94,3 +94,4 @@ function About() {
 }
 
 export default About;
+
