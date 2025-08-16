@@ -1,111 +1,85 @@
 <!doctype html>
 <html lang="vi">
-  <head>
-    <meta charset="utf-8" />
-    <link rel="icon" type="image/gif" href="%PUBLIC_URL%/2.gif" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#000000" />
-    <meta name="description" content="主页网站简介 WangYi!" />
-    <title>WangYi</title>
+<head>
+  <meta charset="utf-8" />
+  <link rel="icon" type="image/gif" href="%PUBLIC_URL%/2.gif" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#000000" />
+  <meta name="description" content="主页网站简介 WangYi!" />
+  <title>WangYi</title>
+</head>
+<body>
+  <noscript>You need to enable JavaScript to run this app.</noscript>
+  <div id="root"></div>
 
-  </head>
-  <body>
-    <noscript>You need to enable JavaScript to run this app.</noscript>
-    
+  <!-- Audio element -->
+  <audio id="background-music" loop preload="metadata">
+    <source src="music/FRAGRANCE-SYENSAN-REMIX-NHẠC-VIRAL-TIKTOK-2025.mp3" type="audio/mpeg" />
+    Trình duyệt của bạn không hỗ trợ thẻ audio.
+  </audio>
 
-    
-    <div id="root"></div>
-    
-    <!-- Audio element -->
-    <audio id="background-music" loop preload="metadata">
-      <source src="https://files.catbox.moe/0gt6h4.mp3" type="audio/mpeg" />
-      Trình duyệt của bạn không hỗ trợ thẻ audio.
-    </audio>
-    
-    <script>
-      const audio = document.getElementById('background-music');
-      audio.volume = 0.3;
-      
-      let audioStarted = false;
-      
-      // Function to try playing audio
-      const tryPlayAudio = () => {
-        if (audioStarted) return;
-        
-        audio.play().then(() => {
-          audioStarted = true;
-          console.log('Audio started successfully');
-        }).catch(error => {
-          console.log('Audio blocked, waiting for user interaction');
-        });
-      };
-      
-      // Function to handle user interaction
-      const handleUserInteraction = () => {
-        if (audioStarted) return;
-        
-        audio.play().then(() => {
-          audioStarted = true;
-          console.log('Audio started after user interaction');
-          // Remove listeners after successful play
-          removeInteractionListeners();
-        }).catch(error => {
-          console.log('Audio play failed even after interaction:', error);
-        });
-      };
-      
-      // Function to add interaction listeners
-      const addInteractionListeners = () => {
-        document.addEventListener('click', handleUserInteraction, { passive: true });
-        document.addEventListener('touchstart', handleUserInteraction, { passive: true });
-        document.addEventListener('touchend', handleUserInteraction, { passive: true });
-        document.addEventListener('keydown', handleUserInteraction, { passive: true });
-        document.addEventListener('scroll', handleUserInteraction, { passive: true });
-      };
-      
-      // Function to remove interaction listeners
-      const removeInteractionListeners = () => {
-        document.removeEventListener('click', handleUserInteraction);
-        document.removeEventListener('touchstart', handleUserInteraction);
-        document.removeEventListener('touchend', handleUserInteraction);
-        document.removeEventListener('keydown', handleUserInteraction);
-        document.removeEventListener('scroll', handleUserInteraction);
-      };
-      
-      // Initialize audio
-      const initAudio = () => {
-        // Try to play immediately (works on some desktop browsers)
-        tryPlayAudio();
-        
-        // If that fails, set up interaction listeners
-        setTimeout(() => {
-          if (!audioStarted) {
-            addInteractionListeners();
-          }
-        }, 100);
-      };
-      
-      // Start when DOM is ready
-      if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initAudio);
-      } else {
-        initAudio();
-      }
-      
-      // Handle visibility changes (pause when tab is hidden)
-      document.addEventListener('visibilitychange', () => {
-        if (document.hidden && !audio.paused) {
-          audio.pause();
-        } else if (!document.hidden && audioStarted) {
-          audio.play().catch(e => console.log('Resume failed:', e));
-        }
+  <script>
+    const audio = document.getElementById('background-music');
+    audio.volume = 0.3; // âm lượng mặc định
+
+    let audioStarted = false;
+
+    const tryPlayAudio = () => {
+      if (audioStarted) return;
+      audio.play().then(() => {
+        audioStarted = true;
+        console.log('Audio started successfully');
+      }).catch(() => {
+        console.log('Autoplay blocked, waiting for user interaction');
       });
-      
-      // Audio event listeners for debugging
-      audio.addEventListener('loadstart', () => console.log('Audio loading...'));
-      audio.addEventListener('canplay', () => console.log('Audio ready to play'));
-      audio.addEventListener('playing', () => console.log('Audio is playing'));
-      audio.addEventListener('error', (e) => console.log('Audio error:', e));
-    </script>
-  </body>
+    };
+
+    const handleUserInteraction = () => {
+      if (audioStarted) return;
+      audio.play().then(() => {
+        audioStarted = true;
+        console.log('Audio started after user interaction');
+        removeInteractionListeners();
+      }).catch(error => console.log('Play failed:', error));
+    };
+
+    const addInteractionListeners = () => {
+      ['click','touchstart','touchend','keydown','scroll'].forEach(evt => {
+        document.addEventListener(evt, handleUserInteraction, { passive: true });
+      });
+    };
+
+    const removeInteractionListeners = () => {
+      ['click','touchstart','touchend','keydown','scroll'].forEach(evt => {
+        document.removeEventListener(evt, handleUserInteraction);
+      });
+    };
+
+    const initAudio = () => {
+      tryPlayAudio(); // cố gắng autoplay trên desktop
+
+      setTimeout(() => {
+        if (!audioStarted) addInteractionListeners(); // nếu bị chặn, yêu cầu tương tác
+      }, 100);
+    };
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initAudio);
+    } else {
+      initAudio();
+    }
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden && !audio.paused) audio.pause();
+      else if (!document.hidden && audioStarted) {
+        audio.play().catch(e => console.log('Resume failed:', e));
+      }
+    });
+
+    audio.addEventListener('loadstart', () => console.log('Audio loading...'));
+    audio.addEventListener('canplay', () => console.log('Audio ready to play'));
+    audio.addEventListener('playing', () => console.log('Audio is playing'));
+    audio.addEventListener('error', (e) => console.log('Audio error:', e));
+  </script>
+</body>
 </html>
