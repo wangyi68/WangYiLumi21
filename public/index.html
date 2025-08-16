@@ -7,29 +7,37 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#000000" />
     <meta name="description" content="主页网站简介 WangYi!" />
-    <meta name="google-site-verification" content="VSF0gx-tLIuerUoFrxQNW5pceVPcySAcrHafgH_HnKE" />
-
-    <!-- Manifest để PWA cũng dùng 2.gif -->
-    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
-
     <title>WangYi</title>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
 
-    <!-- Audio autoplay và loop -->
+    <!-- Audio autoplay và loop MP3 -->
     <audio id="background-music" autoplay loop>
-      <source src="https://github.com/wangyi68/LumiLumi/raw/refs/heads/main/assets/music/SYENSANREMIX.mp4" type="audio/mp4" />
+      <source src="https://files.catbox.moe/gk6p2q.crdownload" type="audio/mpeg" />
       Trình duyệt của bạn không hỗ trợ thẻ audio.
     </audio>
 
-    <!-- Tùy chọn: nếu muốn tự động phát lại bằng JS (tránh bị trình duyệt chặn) -->
     <script>
       const audio = document.getElementById('background-music');
-      audio.volume = 0.5; // chỉnh âm lượng từ 0 đến 1
+      audio.volume = 0.5;
+
+      // Thử tự phát ngay
       audio.play().catch(() => {
-        console.log('Tự động phát nhạc bị chặn, cần tương tác người dùng.');
+        console.log('Tự động phát MP3 bị chặn, cần tương tác người dùng.');
+
+        // Khi người dùng click hoặc touch, phát nhạc
+        const enableAudio = () => {
+          audio.play().then(() => {
+            console.log('Đang phát nhạc MP3 sau khi người dùng tương tác.');
+          }).catch(err => console.error('Không thể phát nhạc:', err));
+          document.body.removeEventListener('click', enableAudio);
+          document.body.removeEventListener('touchstart', enableAudio);
+        };
+
+        document.body.addEventListener('click', enableAudio);
+        document.body.addEventListener('touchstart', enableAudio);
       });
     </script>
   </body>
