@@ -8,3 +8,4 @@ Simply a personal website
 - 💦 **Frameworks & Styling**: ReactJS, Tailwindcss.
 - ⚡ **API**: Github, Lanyard, Open Weather Map
 
+Credit Kitomc
