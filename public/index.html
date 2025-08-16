@@ -2,7 +2,6 @@
 <html lang="vi">
   <head>
     <meta charset="utf-8" />
-    <!-- Favicon GIF động -->
     <link rel="icon" type="image/gif" href="%PUBLIC_URL%/2.gif" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#000000" />
@@ -13,9 +12,9 @@
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
 
-    <!-- Audio autoplay và loop MP3 -->
-    <audio id="background-music" autoplay loop>
-      <source src="https://github.com/wangyi68/test/raw/refs/heads/main/FRAGRANCE-SYENSAN-REMIX-NH%E1%BA%A0C-VIRAL-TIKTOK-2025.mp3" type="audio/mpeg" />
+    <!-- Audio autoplay MP3 -->
+    <audio id="background-music">
+      <source src="https://github.com/wangyi68/LumiLumi/raw/refs/heads/main/assets/music/SYENSANREMIX.mp3" type="audio/mpeg" />
       Trình duyệt của bạn không hỗ trợ thẻ audio.
     </audio>
 
@@ -23,23 +22,31 @@
       const audio = document.getElementById('background-music');
       audio.volume = 0.5;
 
-      // Thử tự phát ngay
-      audio.play().catch(() => {
-        console.log('Tự động phát MP3 bị chặn, cần tương tác người dùng.');
+      // Hàm để play audio và tự lặp khi kết thúc
+      const playLoop = () => {
+        audio.play().catch(() => {
+          console.log('Tự động phát MP3 bị chặn, cần tương tác người dùng.');
+        });
+      };
 
-        // Khi người dùng click hoặc touch, phát nhạc
-        const enableAudio = () => {
-          audio.play().then(() => {
-            console.log('Đang phát nhạc MP3 sau khi người dùng tương tác.');
-          }).catch(err => console.error('Không thể phát nhạc:', err));
-          document.body.removeEventListener('click', enableAudio);
-          document.body.removeEventListener('touchstart', enableAudio);
-        };
-
-        document.body.addEventListener('click', enableAudio);
-        document.body.addEventListener('touchstart', enableAudio);
+      // Khi audio kết thúc, phát lại ngay
+      audio.addEventListener('ended', () => {
+        audio.currentTime = 0; // quay về đầu
+        playLoop();
       });
+
+      // Thử tự phát ngay
+      playLoop();
+
+      // Fallback: nếu bị chặn, click/touch để bật nhạc
+      const enableAudio = () => {
+        playLoop();
+        document.body.removeEventListener('click', enableAudio);
+        document.body.removeEventListener('touchstart', enableAudio);
+      };
+
+      document.body.addEventListener('click', enableAudio);
+      document.body.addEventListener('touchstart', enableAudio);
     </script>
   </body>
 </html>
-
