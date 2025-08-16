@@ -12,35 +12,22 @@
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
 
-    <!-- Audio autoplay MP3 -->
-    <audio id="background-music">
-      <source src="https://github.com/wangyi68/test/raw/refs/heads/main/FRAGRANCE-SYENSAN-REMIX-NH%E1%BA%A0C-VIRAL-TIKTOK-2025.mp3" type="audio/mpeg" />
+    <!-- Audio autoplay muted để mobile không chặn -->
+    <audio id="background-music" autoplay muted loop>
+      <source src="https://github.com/wangyi68/test/raw/refs/heads/main/FRAGRANCE-SYENSAN-REMIX-NHẠC-VIRAL-TIKTOK-2025.mp3" type="audio/mpeg" />
       Trình duyệt của bạn không hỗ trợ thẻ audio.
     </audio>
 
     <script>
       const audio = document.getElementById('background-music');
-      audio.volume = 0.5;
+      audio.volume = 0.5; // cài volume mặc định
 
-      // Hàm để play audio và tự lặp khi kết thúc
-      const playLoop = () => {
-        audio.play().catch(() => {
-          console.log('Tự động phát MP3 bị chặn, cần tương tác người dùng.');
-        });
-      };
-
-      // Khi audio kết thúc, phát lại ngay
-      audio.addEventListener('ended', () => {
-        audio.currentTime = 0; // quay về đầu
-        playLoop();
-      });
-
-      // Thử tự phát ngay
-      playLoop();
-
-      // Fallback: nếu bị chặn, click/touch để bật nhạc
+      // Khi người dùng tương tác, bỏ mute để nghe âm thanh
       const enableAudio = () => {
-        playLoop();
+        audio.muted = false;
+        audio.play().catch(() => {
+          console.log('Vẫn bị chặn, cần thử click/touch thêm.');
+        });
         document.body.removeEventListener('click', enableAudio);
         document.body.removeEventListener('touchstart', enableAudio);
       };
