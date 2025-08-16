@@ -7,50 +7,105 @@
     <meta name="theme-color" content="#000000" />
     <meta name="description" content="主页网站简介 WangYi!" />
     <title>WangYi</title>
+
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
-    <div id="root"></div>
+    
 
-    <!-- Audio element without autoplay initially -->
-    <audio id="background-music" loop>
+    
+    <div id="root"></div>
+    
+    <!-- Audio element -->
+    <audio id="background-music" loop preload="metadata">
       <source src="https://files.catbox.moe/0gt6h4.mp3" type="audio/mpeg" />
       Trình duyệt của bạn không hỗ trợ thẻ audio.
     </audio>
-
+    
     <script>
       const audio = document.getElementById('background-music');
-      audio.volume = 0.5;
+      audio.volume = 0.3;
       
-      // Function to handle audio play
-      const playAudio = () => {
-        // Try to play immediately (works on desktop)
+      let audioStarted = false;
+      
+      // Function to try playing audio
+      const tryPlayAudio = () => {
+        if (audioStarted) return;
+        
         audio.play().then(() => {
-          audio.muted = false;
+          audioStarted = true;
+          console.log('Audio started successfully');
         }).catch(error => {
-          // If blocked, wait for user interaction
-          const enableAudio = () => {
-            audio.muted = false;
-            audio.play().catch(e => console.log('Audio play failed:', e));
-            
-            // Remove listeners after first interaction
-            document.removeEventListener('click', enableAudio);
-            document.removeEventListener('touchstart', enableAudio);
-            document.removeEventListener('keydown', enableAudio);
-          };
-          
-          // Add multiple interaction listeners
-          document.addEventListener('click', enableAudio, { once: true });
-          document.addEventListener('touchstart', enableAudio, { once: true });
-          document.addEventListener('keydown', enableAudio, { once: true });
+          console.log('Audio blocked, waiting for user interaction');
         });
       };
-
-      // Start the audio process when DOM is loaded
-      document.addEventListener('DOMContentLoaded', playAudio);
       
-      // Also try when window loads (for good measure)
-      window.addEventListener('load', playAudio);
+      // Function to handle user interaction
+      const handleUserInteraction = () => {
+        if (audioStarted) return;
+        
+        audio.play().then(() => {
+          audioStarted = true;
+          console.log('Audio started after user interaction');
+          // Remove listeners after successful play
+          removeInteractionListeners();
+        }).catch(error => {
+          console.log('Audio play failed even after interaction:', error);
+        });
+      };
+      
+      // Function to add interaction listeners
+      const addInteractionListeners = () => {
+        document.addEventListener('click', handleUserInteraction, { passive: true });
+        document.addEventListener('touchstart', handleUserInteraction, { passive: true });
+        document.addEventListener('touchend', handleUserInteraction, { passive: true });
+        document.addEventListener('keydown', handleUserInteraction, { passive: true });
+        document.addEventListener('scroll', handleUserInteraction, { passive: true });
+      };
+      
+      // Function to remove interaction listeners
+      const removeInteractionListeners = () => {
+        document.removeEventListener('click', handleUserInteraction);
+        document.removeEventListener('touchstart', handleUserInteraction);
+        document.removeEventListener('touchend', handleUserInteraction);
+        document.removeEventListener('keydown', handleUserInteraction);
+        document.removeEventListener('scroll', handleUserInteraction);
+      };
+      
+      // Initialize audio
+      const initAudio = () => {
+        // Try to play immediately (works on some desktop browsers)
+        tryPlayAudio();
+        
+        // If that fails, set up interaction listeners
+        setTimeout(() => {
+          if (!audioStarted) {
+            addInteractionListeners();
+          }
+        }, 100);
+      };
+      
+      // Start when DOM is ready
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initAudio);
+      } else {
+        initAudio();
+      }
+      
+      // Handle visibility changes (pause when tab is hidden)
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden && !audio.paused) {
+          audio.pause();
+        } else if (!document.hidden && audioStarted) {
+          audio.play().catch(e => console.log('Resume failed:', e));
+        }
+      });
+      
+      // Audio event listeners for debugging
+      audio.addEventListener('loadstart', () => console.log('Audio loading...'));
+      audio.addEventListener('canplay', () => console.log('Audio ready to play'));
+      audio.addEventListener('playing', () => console.log('Audio is playing'));
+      audio.addEventListener('error', (e) => console.log('Audio error:', e));
     </script>
   </body>
 </html>
