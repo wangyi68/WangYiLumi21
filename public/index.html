@@ -12,29 +12,45 @@
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
 
-    <!-- Audio autoplay muted để mobile không chặn -->
-    <audio id="background-music" autoplay muted loop>
+    <!-- Audio element without autoplay initially -->
+    <audio id="background-music" loop>
       <source src="https://files.catbox.moe/0gt6h4.mp3" type="audio/mpeg" />
       Trình duyệt của bạn không hỗ trợ thẻ audio.
     </audio>
 
     <script>
       const audio = document.getElementById('background-music');
-      audio.volume = 0.5; // cài volume mặc định
-
-      // Khi người dùng tương tác, bỏ mute để nghe âm thanh
-      const enableAudio = () => {
-        audio.muted = false;
-        audio.play().catch(() => {
-          console.log('Vẫn bị chặn, cần thử click/touch thêm.');
+      audio.volume = 0.5;
+      
+      // Function to handle audio play
+      const playAudio = () => {
+        // Try to play immediately (works on desktop)
+        audio.play().then(() => {
+          audio.muted = false;
+        }).catch(error => {
+          // If blocked, wait for user interaction
+          const enableAudio = () => {
+            audio.muted = false;
+            audio.play().catch(e => console.log('Audio play failed:', e));
+            
+            // Remove listeners after first interaction
+            document.removeEventListener('click', enableAudio);
+            document.removeEventListener('touchstart', enableAudio);
+            document.removeEventListener('keydown', enableAudio);
+          };
+          
+          // Add multiple interaction listeners
+          document.addEventListener('click', enableAudio, { once: true });
+          document.addEventListener('touchstart', enableAudio, { once: true });
+          document.addEventListener('keydown', enableAudio, { once: true });
         });
-        document.body.removeEventListener('click', enableAudio);
-        document.body.removeEventListener('touchstart', enableAudio);
       };
 
-      document.body.addEventListener('click', enableAudio);
-      document.body.addEventListener('touchstart', enableAudio);
+      // Start the audio process when DOM is loaded
+      document.addEventListener('DOMContentLoaded', playAudio);
+      
+      // Also try when window loads (for good measure)
+      window.addEventListener('load', playAudio);
     </script>
   </body>
 </html>
-
