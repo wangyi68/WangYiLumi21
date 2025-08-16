@@ -56,7 +56,7 @@ const GitHubProjects = () => {
                 <FontAwesomeIcon icon={faBook} />
                 <p>{project.name}</p>
               </div>
-              <p className='text-sm truncate w-full overflow-hidden'>Mô tả: {project.description}</p>
+              <p className='text-sm truncate w-full overflow-hidden'>描述: {project.description}</p>
               <div className='flex gap-3 text-sm'>
                 {project.language && (
                   <p>
