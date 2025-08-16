@@ -45,6 +45,11 @@ function Nav() {
       />
     </svg>
   );
+  const AnimeIcon = (
+    <svg className='w-5 h-5 text-indigo-600 translate-y-[1px]' aria-hidden='true' xmlns='http://www.w3.org/2000/svg' fill='currentColor' viewBox='0 0 24 24'>
+      <path fillRule='evenodd' d='M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16Zm-1-9h2v2h-2v-2Zm0-4h2v2h-2V7Z' clipRule='evenodd' />
+    </svg>
+  )
 
   return (
     <div className='flex md:p-2 pb-8 py-2 px-5 md:rounded-xl bg-white shadow-sm md:mt-3 md:border-none '>
@@ -63,6 +68,9 @@ function Nav() {
         </Link>
         <Link to='/specs'>
           <div className={navItemStyle}>Specs {specIcon}</div>
+        </Link>
+        <Link to='/pinterest'>
+          <div className={navItemStyle}>Pinterest {AnimeIcon}</div>
         </Link>
       </div>
     </div>

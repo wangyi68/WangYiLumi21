@@ -4,6 +4,7 @@ const routes = {
   games: "/games",
   projects: "/projects",
   specs: "/specs",
+  pinterest: "/pinterest",
   projectDetails: "/projects/:projectName",
   notfound: "/*",
 };

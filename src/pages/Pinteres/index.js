@@ -1,0 +1,98 @@
+// src/pages/Anime/PinterestPage.js
+import React, { useState } from "react";
+import { pinterest } from "../../config/pinterest"; // dữ liệu Pinterest
+import { Skeleton } from "../../components/ui/Skeleton";
+
+export const Heading = ({ name, emoji, sId }) => (
+  <h2 id={sId} className="text-4xl font-bold">
+    {emoji} {name}
+  </h2>
+);
+
+function PinterestPage() {
+  const [modalImage, setModalImage] = useState(null);
+
+  return (
+    <div className="p-4">
+      <Heading name="Pinterest" emoji="🌟" sId="pinterest" />
+      <p className="mt-4 text-neutral-400">
+         Pinterest <span className="underline underline-offset-2"> Image</span> Preview{" "}
+        <span className="text-neutral-500">那些事...</span>
+      </p>
+
+      <div className="fade-in-left mt-10 max-w-[896px]" id="anime">
+        {pinterest.map(({ rank, name, description, image, url }) => (
+          <a
+            key={rank}
+            href="#!"
+            onClick={(e) => {
+              e.preventDefault();
+              setModalImage(image);
+            }}
+            className="group relative mb-4 flex h-36 items-center overflow-hidden rounded-lg px-4 duration-300 before:absolute before:inset-0 before:z-10 before:bg-black before:opacity-0 before:transition before:duration-150 hover:h-48 hover:before:opacity-50 sm:px-8"
+          >
+            <img
+              src={image}
+              alt={name}
+              className="absolute left-0 top-0 h-full w-full rounded-lg bg-neutral-900 object-cover duration-150 group-hover:scale-[1.02] sm:h-auto sm:w-auto"
+            />
+            <div className="z-20 w-full scale-95 space-y-1 opacity-0 duration-300 group-hover:scale-100 group-hover:opacity-100">
+              <p className="text-3xl font-bold text-neutral-50">
+                <span className="text-neutral-300">{rank} </span>
+                {name}
+              </p>
+              <p className="text-base text-neutral-300 md:text-lg"># {description}</p>
+            </div>
+          </a>
+        ))}
+      </div>
+
+      {/* Modal preview */}
+      {modalImage && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
+          onClick={() => setModalImage(null)}
+        >
+          <img
+            src={modalImage}
+            alt="Preview"
+            className="max-h-full max-w-full object-contain rounded-lg shadow-lg"
+            onClick={(e) => e.stopPropagation()}
+          />
+          <button
+            onClick={() => setModalImage(null)}
+            className="absolute top-4 right-4 text-white text-2xl font-bold"
+          >
+            &times;
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Skeleton khi load
+const PinterestPageSkeleton = () => {
+  return (
+    <ul className="fade-in-left mt-10 max-w-[896px] space-y-4">
+      {pinterest.map((item, i) => (
+        <li key={i}>
+          <Skeleton src={item.image} className="rounded-lg" />
+        </li>
+      ))}
+    </ul>
+  );
+};
+
+// Lazy load
+const LazyPinterestPage = React.lazy(() =>
+  Promise.resolve({ default: PinterestPage })
+);
+
+export default function PinterestPageWrapper() {
+  return (
+    <React.Suspense fallback={<PinterestPageSkeleton />}>
+      <LazyPinterestPage />
+    </React.Suspense>
+  );
+}
