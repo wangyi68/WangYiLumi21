@@ -20,24 +20,9 @@ function Games() {
   }, []);
 
   const games = [
-    {
-      name: "Genshin Impact",
-      time: "1324",
-      img: Genshin_Impact_App,
-       url: "https://genshin.hoyoverse.com/",
-    },
-    {
-      name: "HonKai Star Rail",
-      time: "17,531.64",
-      img: Honkai_Star_Rail_App,
-      url: "https://hsr.hoyoverse.com/",
-    },
-    {
-      name: "Wuthering Waves",
-      time: "54",
-      img: WuWa,
-      url: "https://wutheringwaves.kurogames.com/",
-    },
+    { name: "Genshin Impact", time: "1324", img: Genshin_Impact_App, url: "https://genshin.hoyoverse.com/" },
+    { name: "HonKai Star Rail", time: "17,531.64", img: Honkai_Star_Rail_App, url: "https://hsr.hoyoverse.com/" },
+    { name: "Wuthering Waves", time: "54", img: WuWa, url: "https://wutheringwaves.kurogames.com/" },
   ];
 
   const allGames = [
@@ -48,6 +33,12 @@ function Games() {
     { name: "Roblox", time: "26", img: roblox, url: "https://www.roblox.com/" },
     { name: "HonKai Star Rail", time: "17,531.64", img: HonkaiStarrail, url: "https://hsr.hoyoverse.com/" },
     { name: "Genshin Impact", time: "8", img: Gayshit, url: "https://genshin.hoyoverse.com/" },
+  ];
+
+  const upcomingEvents = [
+    { name: "Genshin Impact - Lantern Rite", img: Genshin_Impact_App },
+    { name: "HonKai Star Rail - New Character", img: Honkai_Star_Rail_App },
+    { name: "Zenless Zone Zero - Event X", img: zzz },
   ];
 
   return (
@@ -66,27 +57,12 @@ function Games() {
         <div className="flex gap-6 flex-wrap">
           {games.map(({ name, time, img, url }) => (
             <div key={time} className="text-center">
-              <Tippy
-                placement="right"
-                offset={[-6, 8]}
-                animation="scale"
-                content={`${time}h = ${(time / 24).toFixed(2)} day`}
-              >
+              <Tippy placement="right" offset={[-6, 8]} animation="scale" content={`${time}h = ${(time / 24).toFixed(2)} day`}>
                 <p className="text-cyan-600 w-fit">{time}h</p>
               </Tippy>
 
-              {/* Bọc trong thẻ <a> để click */}
-              <a
-                href={url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-block rounded-xl cursor-pointer overflow-hidden transition-transform ring-cyan-600 hover:ring-4 focus:ring-4 bg-white"
-              >
-                <Img
-                  className="object-contain max-w-[160px] max-h-[240px]"
-                  src={img}
-                  alt={name}
-                />
+              <a href={url} target="_blank" rel="noopener noreferrer" className="inline-block rounded-xl cursor-pointer overflow-hidden transition-transform ring-cyan-600 hover:ring-4 focus:ring-4 bg-white">
+                <Img className="object-contain max-w-[160px] max-h-[240px]" src={img} alt={name} />
               </a>
 
               <h4 className="truncate w-full">{name}</h4>
@@ -112,19 +88,26 @@ function Games() {
                 </div>
               }
             >
-              <a
-                href={url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex justify-center items-center border border-slate-800/10 rounded-md overflow-hidden transition-transform ring-cyan-600 hover:ring-2 focus:ring-2 bg-white p-1"
-              >
-                <Img
-                  className="object-contain max-h-[84px] max-w-full"
-                  src={img}
-                  alt={name}
-                />
+              <a href={url} target="_blank" rel="noopener noreferrer" className="flex justify-center items-center border border-slate-800/10 rounded-md overflow-hidden transition-transform ring-cyan-600 hover:ring-2 focus:ring-2 bg-white p-1">
+                <Img className="object-contain max-h-[84px] max-w-full" src={img} alt={name} />
               </a>
             </Tippy>
+          ))}
+        </div>
+
+        {/* Event Game - Coming Soon */}
+        <h3 className="mb-2 text-lg mt-6">
+          <span>⬤</span> 游戏活动 🎉 (Coming Soon)
+        </h3>
+        <div className="flex gap-6 flex-wrap">
+          {upcomingEvents.map(({ name, img }, index) => (
+            <div key={index} className="text-center">
+              <div className="inline-block rounded-xl overflow-hidden cursor-not-allowed opacity-60 bg-white p-1">
+                <Img className="object-contain max-w-[160px] max-h-[240px]" src={img} alt={name} />
+              </div>
+              <h4 className="truncate w-full">{name}</h4>
+              <p className="text-sm text-gray-500">Coming Soon 🚀</p>
+            </div>
           ))}
         </div>
       </div>
