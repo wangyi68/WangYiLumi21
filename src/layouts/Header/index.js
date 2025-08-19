@@ -49,7 +49,7 @@ function Header() {
             target="_blank"
             rel="noopener noreferrer"
             className="rounded-full bg-cyan-200 size-[38px] flex items-center justify-center hover:bg-cyan-500"
-            href="https://lumiyi.vercel.app/"
+            href="https://lumi-lumi-alpha.vercel.app/"
           >
             <img
               src="https://api.iconify.design/simple-icons:vercel.svg"
@@ -75,3 +75,4 @@ function Header() {
 }
 
 export default Header;
+
