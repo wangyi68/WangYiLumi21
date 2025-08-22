@@ -24,9 +24,9 @@ const translations = {
   en: {
     gamesTitle: "Games 🎮",
     playedGames: "Games I've played and time...✨",
-    topGames: "⬤ Games 🌎 Most Played",
-    allGames: "⬤ All 🎏",
-    gameEvents: "⬤ Game Events 🎉",
+    topGames: "Top Games 🌟",
+    allGames: "All Games 🎮",
+    gameEvents: "Game Events 🎉",
     activeCodes: "Active Codes",
     inactiveCodes: "Inactive Codes",
     noActiveCodes: "No active codes available",
@@ -37,7 +37,7 @@ const translations = {
     copied: "Copied:",
     viewFull: "View Full Event Details",
     noDescription: "No detailed description available for this event.",
-    calendar: "⬤ Calendar 📅",
+    calendar: "Calendar 📅",
     events: "Events",
     banners: "Banners",
     challenges: "Challenges",
@@ -47,9 +47,9 @@ const translations = {
   zh: {
     gamesTitle: "游戏 🎮",
     playedGames: "我玩的游戏和时间...✨",
-    topGames: "⬤ 游戏 🌎 玩得最多",
-    allGames: "⬤ 全部 🎏",
-    gameEvents: "⬤ 游戏活动 🎉",
+    topGames: "热门游戏 🌟",
+    allGames: "所有游戏 🎮",
+    gameEvents: "游戏活动 🎉",
     activeCodes: "激活码",
     inactiveCodes: "失效码",
     noActiveCodes: "没有可用的激活码",
@@ -60,7 +60,7 @@ const translations = {
     copied: "已复制:",
     viewFull: "查看完整事件详情",
     noDescription: "此事件没有详细描述。",
-    calendar: "⬤ 日历 📅",
+    calendar: "日历 📅",
     events: "事件",
     banners: "横幅",
     challenges: "挑战",
@@ -91,7 +91,7 @@ const fmtCountdown = (expiredAt) => {
   if (diff <= 0) return "Expired";
   const days = Math.floor(diff / 86400);
   const hours = Math.floor((diff % 86400) / 3600);
-  return `Remaining: ${days}d ${hours}h`;
+  return `Ends in ${days}d ${hours}h`;
 };
 
 const classNames = (...arr) => arr.filter(Boolean).join(" ");
@@ -99,10 +99,10 @@ const classNames = (...arr) => arr.filter(Boolean).join(" ");
 // Skeleton Card Component
 function SkeletonCard() {
   return (
-    <div className="bg-white rounded-xl shadow p-2 w-full animate-pulse">
-      <div className="h-32 bg-slate-200 rounded-lg mb-2"></div>
-      <div className="h-4 bg-slate-200 rounded w-3/4 mb-1"></div>
-      <div className="h-3 bg-slate-200 rounded w-1/2"></div>
+    <div className="bg-white rounded-lg shadow-sm p-3 w-full animate-pulse">
+      <div className="h-28 bg-gray-200 rounded-md mb-2"></div>
+      <div className="h-4 bg-gray-200 rounded w-3/4 mb-1"></div>
+      <div className="h-3 bg-gray-200 rounded w-1/2"></div>
     </div>
   );
 }
@@ -115,7 +115,7 @@ function Toast({ message, onClose }) {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 20 }}
       transition={{ duration: 0.3 }}
-      className="fixed bottom-4 left-4 right-4 mx-auto max-w-xs bg-emerald-500 text-white px-3 py-2 rounded-lg shadow-lg text-xs z-50 sm:bottom-6 sm:max-w-sm sm:text-sm"
+      className="fixed bottom-4 left-4 right-4 mx-auto max-w-xs bg-green-600 text-white px-3 py-2 rounded-lg shadow-md text-xs z-50 sm:max-w-sm sm:text-sm sm:bottom-6"
     >
       {message}
       <button
@@ -136,7 +136,7 @@ function EventPreview({ event, onClose }) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-3 sm:p-4"
+      className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-3 sm:p-4"
       onClick={onClose}
     >
       <motion.div
@@ -144,36 +144,36 @@ function EventPreview({ event, onClose }) {
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.9, opacity: 0 }}
         transition={{ duration: 0.3 }}
-        className="bg-white rounded-xl p-3 sm:p-5 max-w-[95vw] sm:max-w-lg w-full max-h-[85vh] overflow-y-auto"
+        className="bg-white rounded-lg p-4 sm:p-5 max-w-[90vw] sm:max-w-md w-full max-h-[85vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex justify-between items-center mb-3">
-          <h3 className="text-base sm:text-lg font-bold">{event.name || event.title}</h3>
-          <button onClick={onClose} className="text-slate-500 hover:text-slate-800" aria-label="Close preview">
+          <h3 className="text-base sm:text-lg font-semibold text-gray-800">{event.name || event.title}</h3>
+          <button onClick={onClose} className="text-gray-500 hover:text-gray-800" aria-label="Close preview">
             ✕
           </button>
         </div>
         <img
           src={event.image_url || event.banner?.[0] || FALLBACK_IMAGE}
           alt={`Banner for event: ${event.name || event.title}`}
-          className="w-full h-40 sm:h-48 object-cover rounded-lg mb-3"
+          className="w-full h-36 sm:h-44 object-cover rounded-md mb-3"
           loading="lazy"
         />
-        <p className="text-xs sm:text-sm text-slate-600 mb-3">
+        <p className="text-xs sm:text-sm text-gray-600 mb-3">
           {event.start_time ? `${fmtDate(event.start_time)} - ${fmtDate(event.end_time)}` : ""}
           {event.type_name && (
-            <span className="ml-2 inline-block bg-cyan-100 text-cyan-800 text-xs px-1.5 py-0.5 rounded-full">
+            <span className="ml-2 inline-block bg-cyan-50 text-cyan-700 text-xs px-1.5 py-0.5 rounded-full">
               {event.type_name}
             </span>
           )}
         </p>
-        <div className="text-xs sm:text-sm text-slate-800 mb-3">
+        <div className="text-xs sm:text-sm text-gray-700 mb-3">
           {event.description || t.noDescription}
         </div>
         {event.rewards?.length > 0 && (
           <div className="mb-3">
-            <h4 className="text-xs sm:text-sm font-semibold">Rewards:</h4>
-            <ul className="text-xs sm:text-sm text-slate-600 list-disc pl-4 space-y-1">
+            <h4 className="text-xs sm:text-sm font-semibold text-gray-800">Rewards:</h4>
+            <ul className="text-xs sm:text-sm text-gray-600 list-disc pl-4 space-y-1">
               {event.rewards.map((reward, i) => (
                 <li key={i}>
                   {reward.name} {reward.amount > 0 ? `(x${reward.amount})` : ""}
@@ -184,16 +184,16 @@ function EventPreview({ event, onClose }) {
         )}
         {event.special_reward && (
           <div className="mb-3">
-            <h4 className="text-xs sm:text-sm font-semibold">Special Reward:</h4>
-            <p className="text-xs sm:text-sm text-slate-600">
+            <h4 className="text-xs sm:text-sm font-semibold text-gray-800">Special Reward:</h4>
+            <p className="text-xs sm:text-sm text-gray-600">
               {event.special_reward.name} {event.special_reward.amount > 0 ? `(x${event.special_reward.amount})` : ""}
             </p>
           </div>
         )}
         {(event.characters?.length > 0 || event.weapons?.length > 0 || event.light_cones?.length > 0) && (
           <div className="mb-3">
-            <h4 className="text-xs sm:text-sm font-semibold">Featured Items:</h4>
-            <ul className="text-xs sm:text-sm text-slate-600 list-disc pl-4 space-y-1">
+            <h4 className="text-xs sm:text-sm font-semibold text-gray-800">Featured Items:</h4>
+            <ul className="text-xs sm:text-sm text-gray-600 list-disc pl-4 space-y-1">
               {event.characters?.map((char, i) => (
                 <li key={`char-${i}`}>
                   {char.name} ({char.rarity}★{char.element ? `, ${char.element}` : ""})
@@ -244,35 +244,35 @@ function CodeCard({ data, onCopy, isCopied }) {
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.98 }}
       className={classNames(
-        "bg-white rounded-xl shadow p-2 w-full text-left hover:ring-2 transition",
-        data.is_active ? "ring-green-400" : "ring-red-400",
+        "bg-white rounded-lg shadow-sm p-3 w-full text-left hover:ring-2 ring-cyan-200 transition",
+        data.is_active ? "border-l-4 border-green-500" : "border-l-4 border-red-500",
         isCopied ? "bg-yellow-50" : ""
       )}
     >
       <div className="flex items-center justify-between gap-2">
-        <p className="font-mono font-semibold text-sm sm:text-base truncate">
+        <p className="font-mono font-semibold text-sm sm:text-base truncate text-gray-800">
           {data.code}
         </p>
         <button
           onClick={() => onCopy(data.code)}
-          className="text-xs px-2 py-1 rounded-md bg-slate-900 text-white hover:bg-slate-800"
+          className="text-xs px-2.5 py-1 rounded-md bg-cyan-600 text-white hover:bg-cyan-700"
           aria-label={`Copy code ${data.code}`}
         >
           Copy
         </button>
       </div>
       {Array.isArray(data.reward) && data.reward.length > 0 && (
-        <ul className="text-xs sm:text-sm text-slate-600 mt-1.5 list-disc pl-4 space-y-0.5">
+        <ul className="text-xs sm:text-sm text-gray-600 mt-2 list-disc pl-4 space-y-0.5">
           {data.reward.map((r, i) => (
             <li key={i}>{r}</li>
           ))}
         </ul>
       )}
       <p className={classNames(
-        "text-xs mt-1",
-        data.is_active ? "text-green-500" : "text-red-500"
+        "text-xs mt-2",
+        data.is_active ? "text-green-600" : "text-red-600"
       )}>
-        {data.is_active ? "Active" : "Inactive"} {countdown}
+        {data.is_active ? "Active" : "Expired"} {countdown}
       </p>
     </motion.div>
   );
@@ -288,7 +288,7 @@ function EventCard({ data, onClick }) {
     <motion.div
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.98 }}
-      className="bg-white rounded-xl shadow p-2 w-full text-left hover:ring-2 ring-cyan-600 transition cursor-pointer"
+      className="bg-white rounded-lg shadow-sm p-3 w-full text-left hover:ring-2 ring-cyan-200 transition cursor-pointer"
       onClick={() => onClick(data)}
       role="button"
       tabIndex={0}
@@ -297,17 +297,17 @@ function EventCard({ data, onClick }) {
       <img
         src={imageUrl}
         alt={`Banner for event: ${data.name || data.title || "Event"}`}
-        className="h-28 sm:h-32 w-full object-cover rounded-lg mb-2"
+        className="h-28 sm:h-32 w-full object-cover rounded-md mb-2"
         onError={() => setImageUrl(FALLBACK_IMAGE)}
         loading="lazy"
       />
-      <p className="font-semibold text-sm sm:text-base line-clamp-2">
+      <p className="font-semibold text-sm sm:text-base line-clamp-2 text-gray-800">
         {data.name || data.title}
       </p>
-      <p className="text-xs text-slate-500 mt-1">
+      <p className="text-xs text-gray-500 mt-1">
         {data.start_time ? `${fmtDate(data.start_time)} - ${fmtDate(data.end_time)}` : data.createdAt ? fmtDate(data.createdAt) : ""}
         {(data.type_name || data.type) && (
-          <span className="ml-2 inline-block bg-cyan-100 text-cyan-800 text-xs px-1.5 py-0.5 rounded-full">
+          <span className="ml-2 inline-block bg-cyan-50 text-cyan-700 text-xs px-1.5 py-0.5 rounded-full">
             {data.type_name || data.type}
           </span>
         )}
@@ -326,7 +326,7 @@ function CalendarCard({ data, onClick }) {
     <motion.div
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.98 }}
-      className="bg-white rounded-xl shadow p-2 w-full text-left hover:ring-2 ring-cyan-600 transition cursor-pointer"
+      className="bg-white rounded-lg shadow-sm p-3 w-full text-left hover:ring-2 ring-cyan-200 transition cursor-pointer"
       onClick={() => onClick(data)}
       role="button"
       tabIndex={0}
@@ -335,17 +335,17 @@ function CalendarCard({ data, onClick }) {
       <img
         src={imageUrl}
         alt={`Banner for ${data.name || data.title || "Item"}`}
-        className="h-28 sm:h-32 w-full object-cover rounded-lg mb-2"
+        className="h-28 sm:h-32 w-full object-cover rounded-md mb-2"
         onError={() => setImageUrl(FALLBACK_IMAGE)}
         loading="lazy"
       />
-      <p className="font-semibold text-sm sm:text-base line-clamp-2">
+      <p className="font-semibold text-sm sm:text-base line-clamp-2 text-gray-800">
         {data.name || `Banner ${data.id} (Version ${data.version})`}
       </p>
-      <p className="text-xs text-slate-500 mt-1">
+      <p className="text-xs text-gray-500 mt-1">
         {data.start_time ? `${fmtDate(data.start_time)} - ${fmtDate(data.end_time)}` : ""}
         {data.type_name && (
-          <span className="ml-2 inline-block bg-cyan-100 text-cyan-800 text-xs px-1.5 py-0.5 rounded-full">
+          <span className="ml-2 inline-block bg-cyan-50 text-cyan-700 text-xs px-1.5 py-0.5 rounded-full">
             {data.type_name}
           </span>
         )}
@@ -359,8 +359,8 @@ function CodesSection({ title, filter, items, loading, onCopy, copiedCode }) {
   const filteredItems = items.filter((item) => item.is_active === filter);
 
   return (
-    <div>
-      <h4 className={`text-base font-semibold mb-2 ${filter ? "text-green-600" : "text-red-600"}`}>{title}</h4>
+    <div className="space-y-3">
+      <h4 className={`text-base font-semibold ${filter ? "text-green-600" : "text-red-600"}`}>{title}</h4>
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 sm:gap-4">
         {loading ? (
           Array.from({ length: 2 }).map((_, i) => (
@@ -378,7 +378,7 @@ function CodesSection({ title, filter, items, loading, onCopy, copiedCode }) {
         )}
       </div>
       {filteredItems.length === 0 && !loading && (
-        <p className="text-center text-slate-500 text-xs sm:text-sm">{filter ? t.noActiveCodes : t.noInactiveCodes}</p>
+        <p className="text-center text-gray-500 text-xs sm:text-sm">{filter ? t.noActiveCodes : t.noInactiveCodes}</p>
       )}
     </div>
   );
@@ -391,10 +391,10 @@ function CalendarSection({ items, loading, onEventClick }) {
   const challenges = (items.challenges || []).sort((a, b) => (b.start_time || 0) - (a.start_time || 0));
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       <div>
-        <h4 className="text-base font-semibold mb-2 text-cyan-600">{t.events}</h4>
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 sm:gap-4">
+        <h4 className="text-base font-semibold text-cyan-600">{t.events}</h4>
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 sm:gap-4 mt-2">
           {loading ? (
             Array.from({ length: 2 }).map((_, i) => (
               <SkeletonCard key={i} />
@@ -409,13 +409,13 @@ function CalendarSection({ items, loading, onEventClick }) {
             ))
           )}
           {events.length === 0 && !loading && (
-            <p className="text-center text-slate-500 text-xs sm:text-sm">{t.noCalendarEvents}</p>
+            <p className="text-center text-gray-500 text-xs sm:text-sm">{t.noCalendarEvents}</p>
           )}
         </div>
       </div>
       <div>
-        <h4 className="text-base font-semibold mb-2 text-cyan-600">{t.banners}</h4>
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 sm:gap-4">
+        <h4 className="text-base font-semibold text-cyan-600">{t.banners}</h4>
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 sm:gap-4 mt-2">
           {loading ? (
             Array.from({ length: 2 }).map((_, i) => (
               <SkeletonCard key={i} />
@@ -430,13 +430,13 @@ function CalendarSection({ items, loading, onEventClick }) {
             ))
           )}
           {banners.length === 0 && !loading && (
-            <p className="text-center text-slate-500 text-xs sm:text-sm">{t.noBanners}</p>
+            <p className="text-center text-gray-500 text-xs sm:text-sm">{t.noBanners}</p>
           )}
         </div>
       </div>
       <div>
-        <h4 className="text-base font-semibold mb-2 text-cyan-600">{t.challenges}</h4>
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 sm:gap-4">
+        <h4 className="text-base font-semibold text-cyan-600">{t.challenges}</h4>
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 sm:gap-4 mt-2">
           {loading ? (
             Array.from({ length: 2 }).map((_, i) => (
               <SkeletonCard key={i} />
@@ -451,7 +451,7 @@ function CalendarSection({ items, loading, onEventClick }) {
             ))
           )}
           {challenges.length === 0 && !loading && (
-            <p className="text-center text-slate-500 text-xs sm:text-sm">{t.noChallenges}</p>
+            <p className="text-center text-gray-500 text-xs sm:text-sm">{t.noChallenges}</p>
           )}
         </div>
       </div>
@@ -462,58 +462,58 @@ function CalendarSection({ items, loading, onEventClick }) {
 // GamesHeader Component
 function GamesHeader() {
   return (
-    <>
-      <div className="mb-2 flex text-xl sm:text-2xl gap-2 font-bold">
-        <div className="bg-neutral-800 h-6 sm:h-7 w-1.5"></div>
+    <div className="mb-4">
+      <div className="flex items-center text-xl sm:text-2xl gap-2 font-semibold text-gray-800">
+        <div className="bg-cyan-600 h-6 sm:h-7 w-1.5 rounded"></div>
         <h2>{t.gamesTitle}</h2>
       </div>
-      <p className="text-xs sm:text-sm">{t.playedGames}</p>
-    </>
+      <p className="text-xs sm:text-sm text-gray-600 mt-1">{t.playedGames}</p>
+    </div>
   );
 }
 
 // GamesList Component
 function GamesList({ topGames, allGames }) {
   return (
-    <>
-      <h3 className="mb-2 text-base sm:text-lg mt-4">{t.topGames}</h3>
+    <div className="space-y-4">
+      <h3 className="text-base sm:text-lg font-semibold text-gray-800">{t.topGames}</h3>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
         {topGames.map(({ name, time, img, url }) => (
           <div key={name} className="text-center">
             <Tippy
-              content={`${time}h = ${(time / 24).toFixed(2)} days`}
+              content={`${time}h ≈ ${(time / 24).toFixed(1)} days`}
               animation="scale"
             >
-              <p className="text-cyan-600 w-fit mx-auto text-xs sm:text-sm">{time}h</p>
+              <p className="text-cyan-600 text-xs sm:text-sm mb-1">{time}h</p>
             </Tippy>
             <a
               href={url}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-block rounded-lg overflow-hidden hover:ring-2 ring-cyan-600 bg-white"
+              className="inline-block rounded-md overflow-hidden hover:ring-2 ring-cyan-200 bg-white shadow-sm"
               aria-label={`Visit ${name} website`}
             >
               <Img
-                className="object-contain w-full max-w-[100px] sm:max-w-[120px] max-h-[150px] sm:max-h-[180px]"
+                className="object-contain w-full max-w-[100px] sm:max-w-[120px] max-h-[140px] sm:max-h-[160px]"
                 src={img}
                 alt={`${name} app icon`}
                 loading="lazy"
               />
             </a>
-            <h4 className="truncate text-xs sm:text-sm mt-1">{name}</h4>
+            <h4 className="text-xs sm:text-sm mt-1 truncate text-gray-800">{name}</h4>
           </div>
         ))}
       </div>
 
-      <h3 className="mb-2 text-base sm:text-lg mt-4">{t.allGames}</h3>
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-3">
+      <h3 className="text-base sm:text-lg font-semibold text-gray-800">{t.allGames}</h3>
+      <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-2 sm:gap-3">
         {allGames.map(({ name, time, img, url }) => (
           <Tippy
             key={name}
             content={
-              <div>
-                <h4>{name}</h4>
-                <p className="text-cyan-300">{time}h</p>
+              <div className="text-center">
+                <h4 className="text-sm font-semibold">{name}</h4>
+                <p className="text-xs text-cyan-300">{time}h</p>
               </div>
             }
           >
@@ -521,15 +521,15 @@ function GamesList({ topGames, allGames }) {
               href={url}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex justify-center items-center border rounded-lg bg-white p-1 hover:ring-2 ring-cyan-600"
+              className="flex justify-center items-center border rounded-md bg-white p-1 hover:ring-2 ring-cyan-200 shadow-sm"
               aria-label={`Visit ${name} website`}
             >
-              <Img className="object-contain w-full max-h-[56px] sm:max-h-[72px]" src={img} alt={`${name} icon`} loading="lazy" />
+              <Img className="object-contain w-full max-h-[48px] sm:max-h-[64px]" src={img} alt={`${name} icon`} loading="lazy" />
             </a>
           </Tippy>
         ))}
       </div>
-    </>
+    </div>
   );
 }
 
@@ -548,11 +548,11 @@ function GamesDashboard({ activeGame, setActiveGame, activeTab, setActiveTab, it
   ];
 
   return (
-    <>
-      <h3 className="mb-2 text-base sm:text-lg mt-6">{t.gameEvents}</h3>
+    <div className="mt-6 space-y-4">
+      <h3 className="text-base sm:text-lg font-semibold text-gray-800">{t.gameEvents}</h3>
 
       {/* Game Tabs */}
-      <div className="flex gap-1.5 sm:gap-2 mb-3 flex-wrap">
+      <div className="flex gap-2 sm:gap-3 flex-wrap">
         {GAME_TABS.map((t) => (
           <motion.button
             key={t.key}
@@ -560,10 +560,10 @@ function GamesDashboard({ activeGame, setActiveGame, activeTab, setActiveTab, it
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             className={classNames(
-              "flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1 rounded-full border text-xs",
+              "flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 rounded-full border text-xs sm:text-sm",
               activeGame === t.key
-                ? "bg-slate-900 text-white border-slate-900"
-                : "bg-white border-slate-200 hover:bg-slate-50"
+                ? "bg-cyan-600 text-white border-cyan-600"
+                : "bg-white border-gray-200 hover:bg-gray-50"
             )}
             aria-label={`Switch to ${t.label} game`}
           >
@@ -574,7 +574,7 @@ function GamesDashboard({ activeGame, setActiveGame, activeTab, setActiveTab, it
       </div>
 
       {/* Content Tabs */}
-      <div className="flex gap-1.5 sm:gap-2 mb-3 flex-wrap">
+      <div className="flex gap-2 sm:gap-3 flex-wrap">
         {CONTENT_TABS.map((t) => (
           <motion.button
             key={t.key}
@@ -582,10 +582,10 @@ function GamesDashboard({ activeGame, setActiveGame, activeTab, setActiveTab, it
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             className={classNames(
-              "px-2 sm:px-3 py-1 rounded-md border text-xs",
+              "px-3 sm:px-4 py-1.5 rounded-md border text-xs sm:text-sm",
               activeTab === t.key
                 ? "bg-cyan-600 text-white border-cyan-600"
-                : "bg-white border-slate-200 hover:bg-slate-50"
+                : "bg-white border-gray-200 hover:bg-gray-50"
             )}
             aria-label={`Switch to ${t.label} tab`}
           >
@@ -596,7 +596,7 @@ function GamesDashboard({ activeGame, setActiveGame, activeTab, setActiveTab, it
 
       {/* Error Message */}
       {error && (
-        <p className="text-center text-red-500 mb-3 text-xs sm:text-sm">{t.errorLoading}</p>
+        <p className="text-center text-red-500 text-xs sm:text-sm">{t.errorLoading}</p>
       )}
 
       {/* Content */}
@@ -606,7 +606,8 @@ function GamesDashboard({ activeGame, setActiveGame, activeTab, setActiveTab, it
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -10 }}
-          className="space-y-6"
+          transition={{ duration: 0.3 }}
+          className="space-y-5"
         >
           {activeTab === "codes" && (
             <>
@@ -631,7 +632,7 @@ function GamesDashboard({ activeGame, setActiveGame, activeTab, setActiveTab, it
                 ))
               )}
               {items.length === 0 && !loading && (
-                <p className="text-center text-slate-500 text-xs sm:text-sm">{t.noEvents}</p>
+                <p className="text-center text-gray-500 text-xs sm:text-sm">{t.noEvents}</p>
               )}
             </div>
           )}
@@ -657,7 +658,7 @@ function GamesDashboard({ activeGame, setActiveGame, activeTab, setActiveTab, it
       <AnimatePresence>
         {toast && <Toast message={toast} onClose={() => setToast(null)} />}
       </AnimatePresence>
-    </>
+    </div>
   );
 }
 
@@ -803,7 +804,7 @@ function Games() {
   };
 
   return (
-    <div className="font-sans text-neutral-800 w-full pb-6 max-w-7xl mx-auto px-3 sm:px-4">
+    <div className="font-sans text-gray-800 w-full pb-6 max-w-7xl mx-auto px-3 sm:px-4 md:px-6">
       <GamesHeader />
       <GamesList topGames={topGames} allGames={allGames} />
       <GamesDashboard
