@@ -99,7 +99,7 @@ const classNames = (...arr) => arr.filter(Boolean).join(" ");
 // Skeleton Card Component
 function SkeletonCard() {
   return (
-    <div className="bg-white rounded-2xl shadow p-3 w-[260px] animate-pulse">
+    <div className="bg-white rounded-2xl shadow p-3 w-full max-w-[260px] mx-auto animate-pulse">
       <div className="h-40 bg-slate-200 rounded-xl mb-2"></div>
       <div className="h-4 bg-slate-200 rounded w-3/4 mb-1"></div>
       <div className="h-3 bg-slate-200 rounded w-1/2"></div>
@@ -115,12 +115,13 @@ function Toast({ message, onClose }) {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 30 }}
       transition={{ duration: 0.3 }}
-      className="fixed bottom-6 right-6 bg-emerald-500 text-white px-4 py-2 rounded-xl shadow-lg text-sm"
+      className="fixed bottom-4 right-4 bg-emerald-500 text-white px-4 py-2 rounded-xl shadow-lg text-sm z-50 md:bottom-6 md:right-6"
     >
       {message}
       <button
         onClick={onClose}
         className="ml-3 text-white/80 hover:text-white"
+        aria-label="Close toast"
       >
         ✕
       </button>
@@ -143,11 +144,11 @@ function EventPreview({ event, onClose }) {
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.8, opacity: 0 }}
         transition={{ duration: 0.3 }}
-        className="bg-white rounded-2xl p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+        className="bg-white rounded-2xl p-4 md:p-6 max-w-full w-full max-h-[90vh] overflow-y-auto sm:max-w-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex justify-between items-center mb-4">
-          <h3 className="text-xl font-bold">{event.name || event.title}</h3>
+          <h3 className="text-lg md:text-xl font-bold">{event.name || event.title}</h3>
           <button onClick={onClose} className="text-slate-500 hover:text-slate-800" aria-label="Close preview">
             ✕
           </button>
@@ -155,10 +156,10 @@ function EventPreview({ event, onClose }) {
         <img
           src={event.image_url || event.banner?.[0] || FALLBACK_IMAGE}
           alt={`Banner for event: ${event.name || event.title}`}
-          className="w-full h-64 object-cover rounded-xl mb-4"
+          className="w-full h-48 md:h-64 object-cover rounded-xl mb-4"
           loading="lazy"
         />
-        <p className="text-sm text-slate-600 mb-4">
+        <p className="text-xs md:text-sm text-slate-600 mb-4">
           {event.start_time ? `${fmtDate(event.start_time)} - ${fmtDate(event.end_time)}` : ""}
           {event.type_name && (
             <span className="ml-2 inline-block bg-cyan-100 text-cyan-800 text-xs px-2 py-1 rounded-full">
@@ -166,13 +167,13 @@ function EventPreview({ event, onClose }) {
             </span>
           )}
         </p>
-        <div className="text-sm text-slate-800 mb-4">
+        <div className="text-xs md:text-sm text-slate-800 mb-4">
           {event.description || t.noDescription}
         </div>
         {event.rewards?.length > 0 && (
           <div className="mb-4">
-            <h4 className="text-sm font-semibold">Rewards:</h4>
-            <ul className="text-sm text-slate-600 list-disc pl-5 space-y-1">
+            <h4 className="text-sm md:text-base font-semibold">Rewards:</h4>
+            <ul className="text-xs md:text-sm text-slate-600 list-disc pl-5 space-y-1">
               {event.rewards.map((reward, i) => (
                 <li key={i}>
                   {reward.name} {reward.amount > 0 ? `(x${reward.amount})` : ""}
@@ -183,16 +184,16 @@ function EventPreview({ event, onClose }) {
         )}
         {event.special_reward && (
           <div className="mb-4">
-            <h4 className="text-sm font-semibold">Special Reward:</h4>
-            <p className="text-sm text-slate-600">
+            <h4 className="text-sm md:text-base font-semibold">Special Reward:</h4>
+            <p className="text-xs md:text-sm text-slate-600">
               {event.special_reward.name} {event.special_reward.amount > 0 ? `(x${event.special_reward.amount})` : ""}
             </p>
           </div>
         )}
         {(event.characters?.length > 0 || event.weapons?.length > 0 || event.light_cones?.length > 0) && (
           <div className="mb-4">
-            <h4 className="text-sm font-semibold">Featured Items:</h4>
-            <ul className="text-sm text-slate-600 list-disc pl-5 space-y-1">
+            <h4 className="text-sm md:text-base font-semibold">Featured Items:</h4>
+            <ul className="text-xs md:text-sm text-slate-600 list-disc pl-5 space-y-1">
               {event.characters?.map((char, i) => (
                 <li key={`char-${i}`}>
                   {char.name} ({char.rarity}★{char.element ? `, ${char.element}` : ""})
@@ -216,7 +217,7 @@ function EventPreview({ event, onClose }) {
             href={event.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-sm text-cyan-600 hover:text-cyan-800 underline"
+            className="text-xs md:text-sm text-cyan-600 hover:text-cyan-800 underline"
             aria-label="View full event details"
           >
             {t.viewFull}
@@ -243,13 +244,13 @@ function CodeCard({ data, onCopy, isCopied }) {
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.98 }}
       className={classNames(
-        "bg-white rounded-2xl shadow p-3 w-[260px] text-left hover:ring-2 transition",
+        "bg-white rounded-2xl shadow p-3 w-full max-w-[260px] mx-auto text-left hover:ring-2 transition",
         data.is_active ? "ring-green-400" : "ring-red-400",
         isCopied ? "bg-yellow-100" : ""
       )}
     >
       <div className="flex items-center justify-between gap-2">
-        <p className="font-mono font-semibold text-lg truncate">
+        <p className="font-mono font-semibold text-base md:text-lg truncate">
           {data.code}
         </p>
         <button
@@ -261,7 +262,7 @@ function CodeCard({ data, onCopy, isCopied }) {
         </button>
       </div>
       {Array.isArray(data.reward) && data.reward.length > 0 && (
-        <ul className="text-sm text-slate-600 mt-2 list-disc pl-5 space-y-1">
+        <ul className="text-xs md:text-sm text-slate-600 mt-2 list-disc pl-5 space-y-1">
           {data.reward.map((r, i) => (
             <li key={i}>{r}</li>
           ))}
@@ -287,7 +288,7 @@ function EventCard({ data, onClick }) {
     <motion.div
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.98 }}
-      className="bg-white rounded-2xl shadow p-3 w-[260px] text-left hover:ring-2 ring-cyan-600 transition cursor-pointer"
+      className="bg-white rounded-2xl shadow p-3 w-full max-w-[260px] mx-auto text-left hover:ring-2 ring-cyan-600 transition cursor-pointer"
       onClick={() => onClick(data)}
       role="button"
       tabIndex={0}
@@ -296,11 +297,11 @@ function EventCard({ data, onClick }) {
       <img
         src={imageUrl}
         alt={`Banner for event: ${data.name || data.title || "Event"}`}
-        className="h-40 w-full object-cover rounded-xl mb-2"
+        className="h-32 md:h-40 w-full object-cover rounded-xl mb-2"
         onError={() => setImageUrl(FALLBACK_IMAGE)}
         loading="lazy"
       />
-      <p className="font-semibold line-clamp-2">
+      <p className="font-semibold text-sm md:text-base line-clamp-2">
         {data.name || data.title}
       </p>
       <p className="text-xs text-slate-500 mt-1">
@@ -325,7 +326,7 @@ function CalendarCard({ data, onClick }) {
     <motion.div
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.98 }}
-      className="bg-white rounded-2xl shadow p-3 w-[260px] text-left hover:ring-2 ring-cyan-600 transition cursor-pointer"
+      className="bg-white rounded-2xl shadow p-3 w-full max-w-[260px] mx-auto text-left hover:ring-2 ring-cyan-600 transition cursor-pointer"
       onClick={() => onClick(data)}
       role="button"
       tabIndex={0}
@@ -334,11 +335,11 @@ function CalendarCard({ data, onClick }) {
       <img
         src={imageUrl}
         alt={`Banner for ${data.name || data.title || "Item"}`}
-        className="h-40 w-full object-cover rounded-xl mb-2"
+        className="h-32 md:h-40 w-full object-cover rounded-xl mb-2"
         onError={() => setImageUrl(FALLBACK_IMAGE)}
         loading="lazy"
       />
-      <p className="font-semibold line-clamp-2">
+      <p className="font-semibold text-sm md:text-base line-clamp-2">
         {data.name || `Banner ${data.id} (Version ${data.version})`}
       </p>
       <p className="text-xs text-slate-500 mt-1">
@@ -359,10 +360,10 @@ function CodesSection({ title, filter, items, loading, onCopy, copiedCode }) {
 
   return (
     <div>
-      <h4 className={`text-lg font-semibold mb-3 ${filter ? "text-green-600" : "text-red-600"}`}>{title}</h4>
+      <h4 className={`text-base md:text-lg font-semibold mb-3 ${filter ? "text-green-600" : "text-red-600"}`}>{title}</h4>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {loading ? (
-          Array.from({ length: 6 }).map((_, i) => (
+          Array.from({ length: 4 }).map((_, i) => (
             <SkeletonCard key={i} />
           ))
         ) : (
@@ -377,7 +378,7 @@ function CodesSection({ title, filter, items, loading, onCopy, copiedCode }) {
         )}
       </div>
       {filteredItems.length === 0 && !loading && (
-        <p className="text-center text-slate-500">{filter ? t.noActiveCodes : t.noInactiveCodes}</p>
+        <p className="text-center text-slate-500 text-sm md:text-base">{filter ? t.noActiveCodes : t.noInactiveCodes}</p>
       )}
     </div>
   );
@@ -393,10 +394,10 @@ function CalendarSection({ items, loading, onEventClick }) {
   return (
     <div className="space-y-8">
       <div>
-        <h4 className="text-lg font-semibold mb-3 text-cyan-600">{t.events}</h4>
+        <h4 className="text-base md:text-lg font-semibold mb-3 text-cyan-600">{t.events}</h4>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {loading ? (
-            Array.from({ length: 6 }).map((_, i) => (
+            Array.from({ length: 4 }).map((_, i) => (
               <SkeletonCard key={i} />
             ))
           ) : (
@@ -409,15 +410,15 @@ function CalendarSection({ items, loading, onEventClick }) {
             ))
           )}
           {events.length === 0 && !loading && (
-            <p className="text-center text-slate-500">{t.noCalendarEvents}</p>
+            <p className="text-center text-slate-500 text-sm md:text-base">{t.noCalendarEvents}</p>
           )}
         </div>
       </div>
       <div>
-        <h4 className="text-lg font-semibold mb-3 text-cyan-600">{t.banners}</h4>
+        <h4 className="text-base md:text-lg font-semibold mb-3 text-cyan-600">{t.banners}</h4>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {loading ? (
-            Array.from({ length: 6 }).map((_, i) => (
+            Array.from({ length: 4 }).map((_, i) => (
               <SkeletonCard key={i} />
             ))
           ) : (
@@ -430,15 +431,15 @@ function CalendarSection({ items, loading, onEventClick }) {
             ))
           )}
           {banners.length === 0 && !loading && (
-            <p className="text-center text-slate-500">{t.noBanners}</p>
+            <p className="text-center text-slate-500 text-sm md:text-base">{t.noBanners}</p>
           )}
         </div>
       </div>
       <div>
-        <h4 className="text-lg font-semibold mb-3 text-cyan-600">{t.challenges}</h4>
+        <h4 className="text-base md:text-lg font-semibold mb-3 text-cyan-600">{t.challenges}</h4>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {loading ? (
-            Array.from({ length: 6 }).map((_, i) => (
+            Array.from({ length: 4 }).map((_, i) => (
               <SkeletonCard key={i} />
             ))
           ) : (
@@ -451,7 +452,7 @@ function CalendarSection({ items, loading, onEventClick }) {
             ))
           )}
           {challenges.length === 0 && !loading && (
-            <p className="text-center text-slate-500">{t.noChallenges}</p>
+            <p className="text-center text-slate-500 text-sm md:text-base">{t.noChallenges}</p>
           )}
         </div>
       </div>
@@ -463,11 +464,11 @@ function CalendarSection({ items, loading, onEventClick }) {
 function GamesHeader() {
   return (
     <>
-      <div className="mb-3 flex text-3xl gap-2 font-bold">
-        <div className="bg-neutral-800 h-[36px] w-2"></div>
+      <div className="mb-3 flex text-2xl md:text-3xl gap-2 font-bold">
+        <div className="bg-neutral-800 h-[28px] md:h-[36px] w-2"></div>
         <h2>{t.gamesTitle}</h2>
       </div>
-      <p>{t.playedGames}</p>
+      <p className="text-sm md:text-base">{t.playedGames}</p>
     </>
   );
 }
@@ -476,15 +477,15 @@ function GamesHeader() {
 function GamesList({ topGames, allGames }) {
   return (
     <>
-      <h3 className="mb-2 text-lg mt-6">{t.topGames}</h3>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+      <h3 className="mb-2 text-base md:text-lg mt-6">{t.topGames}</h3>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
         {topGames.map(({ name, time, img, url }) => (
           <div key={name} className="text-center">
             <Tippy
               content={`${time}h = ${(time / 24).toFixed(2)} days`}
               animation="scale"
             >
-              <p className="text-cyan-600 w-fit">{time}h</p>
+              <p className="text-cyan-600 w-fit mx-auto text-sm md:text-base">{time}h</p>
             </Tippy>
             <a
               href={url}
@@ -494,19 +495,19 @@ function GamesList({ topGames, allGames }) {
               aria-label={`Visit ${name} website`}
             >
               <Img
-                className="object-contain max-w-[160px] max-h-[240px]"
+                className="object-contain w-full max-w-[120px] md:max-w-[160px] max-h-[180px] md:max-h-[240px]"
                 src={img}
                 alt={`${name} app icon`}
                 loading="lazy"
               />
             </a>
-            <h4 className="truncate">{name}</h4>
+            <h4 className="truncate text-sm md:text-base">{name}</h4>
           </div>
         ))}
       </div>
 
-      <h3 className="mb-2 text-lg mt-6">{t.allGames}</h3>
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+      <h3 className="mb-2 text-base md:text-lg mt-6">{t.allGames}</h3>
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 md:gap-4">
         {allGames.map(({ name, time, img, url }) => (
           <Tippy
             key={name}
@@ -524,7 +525,7 @@ function GamesList({ topGames, allGames }) {
               className="flex justify-center items-center border rounded-md bg-white p-1 hover:ring-2 ring-cyan-600"
               aria-label={`Visit ${name} website`}
             >
-              <Img className="object-contain max-h-[84px]" src={img} alt={`${name} icon`} loading="lazy" />
+              <Img className="object-contain w-full max-h-[64px] md:max-h-[84px]" src={img} alt={`${name} icon`} loading="lazy" />
             </a>
           </Tippy>
         ))}
@@ -549,7 +550,7 @@ function GamesDashboard({ activeGame, setActiveGame, activeTab, setActiveTab, it
 
   return (
     <>
-      <h3 className="mb-2 text-lg mt-8">{t.gameEvents}</h3>
+      <h3 className="mb-2 text-base md:text-lg mt-8">{t.gameEvents}</h3>
 
       {/* Game Tabs */}
       <div className="flex gap-2 mb-3 flex-wrap">
@@ -560,14 +561,14 @@ function GamesDashboard({ activeGame, setActiveGame, activeTab, setActiveTab, it
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             className={classNames(
-              "flex items-center gap-2 px-3 py-1.5 rounded-full border text-sm",
+              "flex items-center gap-2 px-2 md:px-3 py-1.5 rounded-full border text-xs md:text-sm",
               activeGame === t.key
                 ? "bg-slate-900 text-white border-slate-900"
                 : "bg-white border-slate-200 hover:bg-slate-50"
             )}
             aria-label={`Switch to ${t.label} game`}
           >
-            <img src={t.icon} alt={`${t.label} icon`} className="w-5 h-5 rounded-full" loading="lazy" />
+            <img src={t.icon} alt={`${t.label} icon`} className="w-4 h-4 md:w-5 md:h-5 rounded-full" loading="lazy" />
             {t.label}
           </motion.button>
         ))}
@@ -582,7 +583,7 @@ function GamesDashboard({ activeGame, setActiveGame, activeTab, setActiveTab, it
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             className={classNames(
-              "px-3 py-1.5 rounded-md border text-sm",
+              "px-2 md:px-3 py-1.5 rounded-md border text-xs md:text-sm",
               activeTab === t.key
                 ? "bg-cyan-600 text-white border-cyan-600"
                 : "bg-white border-slate-200 hover:bg-slate-50"
@@ -596,7 +597,7 @@ function GamesDashboard({ activeGame, setActiveGame, activeTab, setActiveTab, it
 
       {/* Error Message */}
       {error && (
-        <p className="text-center text-red-500 mb-4">{t.errorLoading}</p>
+        <p className="text-center text-red-500 mb-4 text-sm md:text-base">{t.errorLoading}</p>
       )}
 
       {/* Content */}
@@ -618,7 +619,7 @@ function GamesDashboard({ activeGame, setActiveGame, activeTab, setActiveTab, it
           {activeTab === "news" && (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {loading ? (
-                Array.from({ length: 6 }).map((_, i) => (
+                Array.from({ length: 4 }).map((_, i) => (
                   <SkeletonCard key={i} />
                 ))
               ) : (
@@ -631,7 +632,7 @@ function GamesDashboard({ activeGame, setActiveGame, activeTab, setActiveTab, it
                 ))
               )}
               {items.length === 0 && !loading && (
-                <p className="text-center text-slate-500">{t.noEvents}</p>
+                <p className="text-center text-slate-500 text-sm md:text-base">{t.noEvents}</p>
               )}
             </div>
           )}
@@ -653,7 +654,7 @@ function GamesDashboard({ activeGame, setActiveGame, activeTab, setActiveTab, it
         )}
       </AnimatePresence>
 
-      {/* Toast */}
+      <!-- Toast -->
       <AnimatePresence>
         {toast && <Toast message={toast} onClose={() => setToast(null)} />}
       </AnimatePresence>
@@ -803,7 +804,7 @@ function Games() {
   };
 
   return (
-    <div className="font-sans text-neutral-800 w-full pb-8 max-w-7xl mx-auto">
+    <div className="font-sans text-neutral-800 w-full pb-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <GamesHeader />
       <GamesList topGames={topGames} allGames={allGames} />
       <GamesDashboard
