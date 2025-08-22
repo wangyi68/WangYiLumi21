@@ -12,6 +12,7 @@
     "@testing-library/react": "^14.2.1",
     "@testing-library/user-event": "^14.5.2",
     "@tippyjs/react": "^4.2.6",
+    "@vercel/speed-insights": "^1.2.0",
     "axios": "^1.6.7",
     "clsx": "^2.1.1",
     "framer-motion": "^12.23.12",
