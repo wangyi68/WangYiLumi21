@@ -70,7 +70,7 @@ const translations = {
 };
 
 // Assume default language is 'en'
-const t = translations.en; // Can be dynamic based on context
+const t = translations.zh; // Can be dynamic based on context
 
 const FALLBACK_IMAGE = "https://via.placeholder.com/260x160?text=No+Image";
 
@@ -828,3 +828,4 @@ function Games() {
 }
 
 export default Games;
+
