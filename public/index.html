@@ -17,103 +17,469 @@
   <noscript>You need to enable JavaScript to run this app.</noscript>
   <div id="root"></div>
 
-  <!-- Audio element -->
-  <audio id="background-music" preload="metadata">
+  <!-- Audio elements for preloading -->
+  <audio id="background-music" preload="auto" crossorigin="anonymous">
     Trình duyệt của bạn không hỗ trợ thẻ audio.
   </audio>
+  <audio id="preload-audio" preload="auto" crossorigin="anonymous" style="display:none;"></audio>
 
   <script>
     const audio = document.getElementById('background-music');
-    audio.volume = 0.3; // âm lượng mặc định
+    const preloadAudio = document.getElementById('preload-audio');
+    audio.volume = 0.3;
+    preloadAudio.volume = 0.3;
     
-    // Danh sách nhạc
+    // Danh sách nhạc với thông tin chi tiết
     const musicTracks = [
-      "music/FRAGRANCE-SYENSAN-REMIX-NHẠC-VIRAL-TIKTOK-2025.mp3",
-      "music/Vietsub ｜ Normal No More - TYSM ｜ Nhạc Hot TikTok ｜ Lyrics Video.mp3"
+      { 
+        src: "music/SYENSAN.mp3", 
+        name: "SYENSAN",
+        loaded: false,
+        duration: null
+      },
+      { 
+        src: "music/NormalNoMore.mp3", 
+        name: "Normal No More",
+        loaded: false,
+        duration: null
+      }
     ];
     
+    // Cache audio buffers
+    const audioCache = new Map();
+    let preloadQueue = [...musicTracks];
+    
     let currentTrackIndex = 0;
-    let audioStarted = true;
+    let nextTrackIndex = 1;
+    let audioInitialized = false;
+    let userHasInteracted = false;
+    let isPlaying = false;
+    let playPromise = null;
+    let autoplayAttempted = false;
+    let isLoading = false;
 
-    // Hàm chọn bài hát ngẫu nhiên
-    const selectRandomTrack = () => {
-      const randomIndex = Math.floor(Math.random() * musicTracks.length);
-      currentTrackIndex = randomIndex;
-      audio.src = musicTracks[currentTrackIndex];
-      console.log('Selected track:', musicTracks[currentTrackIndex]);
+    // Preload và cache audio
+    const preloadTrack = async (trackIndex) => {
+      const track = musicTracks[trackIndex];
+      if (track.loaded || audioCache.has(track.src)) return true;
+      
+      return new Promise((resolve) => {
+        console.log('⬇️ Preloading:', track.name);
+        const tempAudio = new Audio();
+        
+        tempAudio.addEventListener('canplaythrough', () => {
+          track.loaded = true;
+          track.duration = tempAudio.duration;
+          audioCache.set(track.src, tempAudio);
+          console.log('✅ Loaded:', track.name, `(${Math.round(track.duration)}s)`);
+          resolve(true);
+        });
+        
+        tempAudio.addEventListener('error', () => {
+          console.log('❌ Failed to load:', track.name);
+          resolve(false);
+        });
+        
+        // Timeout after 10 seconds
+        setTimeout(() => {
+          console.log('⏱️ Timeout loading:', track.name);
+          resolve(false);
+        }, 10000);
+        
+        tempAudio.preload = 'auto';
+        tempAudio.src = track.src;
+        tempAudio.load();
+      });
     };
 
-    // Hàm phát bài tiếp theo (ngẫu nhiên)
-    const playNextTrack = () => {
-      selectRandomTrack();
-      if (audioStarted) {
-        audio.play().catch(error => console.log('Play next track failed:', error));
+    // Preload batch tracks
+    const preloadBatch = async () => {
+      const loadPromises = musicTracks.map((_, index) => preloadTrack(index));
+      await Promise.allSettled(loadPromises);
+      console.log('🎵 All tracks preload completed');
+    };
+
+    // Hàm chọn bài hát ngẫu nhiên với preload
+    const selectRandomTrack = async () => {
+      const availableTracks = musicTracks
+        .map((track, index) => ({ track, index }))
+        .filter(({ track }) => track.loaded || audioCache.has(track.src));
+      
+      if (availableTracks.length === 0) {
+        // Fallback: chọn track đầu tiên và cố gắng load
+        currentTrackIndex = 0;
+        await preloadTrack(0);
+      } else {
+        const randomIndex = Math.floor(Math.random() * availableTracks.length);
+        currentTrackIndex = availableTracks[randomIndex].index;
+      }
+      
+      const track = musicTracks[currentTrackIndex];
+      
+      // Sử dụng cached audio nếu có
+      if (audioCache.has(track.src)) {
+        const cachedAudio = audioCache.get(track.src);
+        audio.src = cachedAudio.src;
+      } else {
+        audio.src = track.src;
+      }
+      
+      // Preload bài tiếp theo
+      nextTrackIndex = (currentTrackIndex + 1) % musicTracks.length;
+      preloadTrack(nextTrackIndex);
+      
+      console.log('🎵 Selected:', track.name);
+      return track;
+    };
+
+    // Hàm play an toàn với loading indicator
+    const safePlay = async () => {
+      try {
+        isLoading = true;
+        
+        // Chờ promise play trước đó hoàn thành
+        if (playPromise) {
+          await playPromise.catch(() => {});
+        }
+        
+        // Đảm bảo audio sẵn sàng
+        if (audio.readyState < 3) { // HAVE_FUTURE_DATA
+          console.log('⏳ Waiting for audio to load...');
+          await new Promise((resolve) => {
+            const onCanPlay = () => {
+              audio.removeEventListener('canplay', onCanPlay);
+              audio.removeEventListener('canplaythrough', onCanPlay);
+              resolve();
+            };
+            audio.addEventListener('canplay', onCanPlay);
+            audio.addEventListener('canplaythrough', onCanPlay);
+            
+            // Timeout after 5 seconds
+            setTimeout(() => {
+              audio.removeEventListener('canplay', onCanPlay);
+              audio.removeEventListener('canplaythrough', onCanPlay);
+              resolve();
+            }, 5000);
+          });
+        }
+        
+        if (audio.paused) {
+          playPromise = audio.play();
+          await playPromise;
+          isPlaying = true;
+          isLoading = false;
+          console.log('✅ Audio playing:', musicTracks[currentTrackIndex].name);
+          return true;
+        }
+        
+        isLoading = false;
+        return true;
+      } catch (error) {
+        isPlaying = false;
+        isLoading = false;
+        playPromise = null;
+        
+        if (error.name === 'NotAllowedError') {
+          if (!userHasInteracted && !autoplayAttempted) {
+            console.log('🔇 Autoplay blocked - waiting for user interaction');
+            autoplayAttempted = true;
+          }
+          return false;
+        } else if (error.name !== 'AbortError') {
+          console.log('❌ Play failed:', error.name);
+        }
+        return false;
       }
     };
 
-    const tryPlayAudio = () => {
-      if (audioStarted) return;
-      selectRandomTrack(); // Chọn bài đầu tiên ngẫu nhiên
-      audio.play().then(() => {
-        audioStarted = true;
-        console.log('Audio started successfully');
-      }).catch(() => {
-        console.log('Autoplay blocked, waiting for user interaction');
-      });
+    // Hàm pause an toàn
+    const safePause = async () => {
+      try {
+        if (playPromise) {
+          await playPromise.catch(() => {});
+        }
+        
+        if (!audio.paused) {
+          audio.pause();
+          isPlaying = false;
+        }
+      } catch (error) {
+        // Ignore pause errors
+      }
     };
 
-    const handleUserInteraction = () => {
-      if (audioStarted) return;
-      if (!audio.src) selectRandomTrack(); // Đảm bảo có bài hát được chọn
-      audio.play().then(() => {
-        audioStarted = true;
-        console.log('Audio started after user interaction');
+    // Hàm phát bài tiếp theo với instant switching
+    const playNextTrack = async () => {
+      if (!audioInitialized) return;
+      
+      console.log('⏭️ Switching to next track...');
+      await safePause();
+      
+      // Instant switch với preloaded track
+      await selectRandomTrack();
+      
+      // Immediate play without delay
+      await safePlay();
+    };
+
+    // Khởi tạo audio khi có tương tác
+    const initializeAudio = async () => {
+      if (audioInitialized) return true;
+      
+      userHasInteracted = true;
+      console.log('🎶 Initializing audio system...');
+      
+      // Chọn track đã được preload
+      await selectRandomTrack();
+      
+      const success = await safePlay();
+      if (success) {
+        audioInitialized = true;
+        console.log('🎉 Audio system ready!');
         removeInteractionListeners();
-      }).catch(error => console.log('Play failed:', error));
+        
+        // Tiếp tục preload các track còn lại
+        preloadBatch();
+        return true;
+      }
+      return false;
     };
 
+    // Xử lý tương tác người dùng - tối ưu cho mobile
+    let interactionHandled = false;
+    let interactionAttempts = 0;
+    const MAX_INTERACTION_ATTEMPTS = 3;
+    
+    const handleUserInteraction = async (e) => {
+      if (interactionHandled || audioInitialized) return;
+      
+      // Đặc biệt xử lý cho mobile - đảm bảo là tương tác thực sự
+      if (e.type === 'touchmove' && !e.touches) return;
+      if (e.type === 'scroll' && !userHasInteracted) return; // Skip passive scroll
+      
+      interactionAttempts++;
+      console.log('👆 User interaction detected:', e.type, `(attempt ${interactionAttempts})`);
+      
+      // Đối với mobile, đợi một chút để đảm bảo tương tác hoàn thành
+      if (e.type.startsWith('touch')) {
+        await new Promise(resolve => setTimeout(resolve, 50));
+      }
+      
+      interactionHandled = true;
+      const success = await initializeAudio();
+      
+      if (!success && interactionAttempts < MAX_INTERACTION_ATTEMPTS) {
+        // Reset để thử lại với tương tác mạnh hơn
+        interactionHandled = false;
+        console.log('🔄 Retrying audio initialization...');
+        
+        // Đợi 1 giây trước khi thử lại
+        setTimeout(() => {
+          if (!audioInitialized) {
+            interactionHandled = false;
+          }
+        }, 1000);
+      }
+    };
+
+    // Thêm event listeners cho tương tác (tối ưu cho mobile)
+    const interactionEvents = [
+      'click', 'touchstart', 'touchend', 'touchmove',
+      'keydown', 'scroll', 'mousemove', 'mousedown',
+      'pointerdown', 'pointerup', 'gesturestart'
+    ];
+    
     const addInteractionListeners = () => {
-      ['click','touchstart','touchend','keydown','scroll'].forEach(evt => {
-        document.addEventListener(evt, handleUserInteraction, { passive: true });
+      interactionEvents.forEach(evt => {
+        document.addEventListener(evt, handleUserInteraction, { 
+          once: false,
+          passive: true,
+          capture: true 
+        });
       });
+      
+      // Thêm listener cho window để bắt mọi tương tác
+      window.addEventListener('focus', handleUserInteraction, { passive: true });
+      window.addEventListener('touchstart', handleUserInteraction, { passive: true });
     };
 
     const removeInteractionListeners = () => {
-      ['click','touchstart','touchend','keydown','scroll'].forEach(evt => {
-        document.removeEventListener(evt, handleUserInteraction);
+      interactionEvents.forEach(evt => {
+        document.removeEventListener(evt, handleUserInteraction, true);
       });
+      window.removeEventListener('focus', handleUserInteraction);
+      window.removeEventListener('touchstart', handleUserInteraction);
     };
 
-    const initAudio = () => {
-      tryPlayAudio(); // cố gắng autoplay trên desktop
+    // Thử autoplay với preloaded track
+    const attemptAutoplay = async () => {
+      // Bắt đầu preload ngay lập tức
+      const preloadPromise = preloadTrack(0);
       
-      setTimeout(() => {
-        if (!audioStarted) addInteractionListeners(); // nếu bị chặn, yêu cầu tương tác
-      }, 100);
+      await selectRandomTrack();
+      const success = await safePlay();
+      
+      if (success) {
+        audioInitialized = true;
+        console.log('🚀 Autoplay successful!');
+        
+        // Continue preloading trong background
+        preloadBatch();
+      } else {
+        // Nếu autoplay thất bại, vẫn preload để sẵn sàng
+        console.log('⏳ Waiting for user interaction...');
+        preloadPromise.then(() => {
+          addInteractionListeners();
+        });
+      }
     };
 
-    // Khi một bài hát kết thúc, phát bài tiếp theo ngẫu nhiên
-    audio.addEventListener('ended', playNextTrack);
+    // Xử lý visibility change - cải thiện cho mobile
+    let visibilityTimeout;
+    const handleVisibilityChange = () => {
+      if (!audioInitialized) return;
+      
+      clearTimeout(visibilityTimeout);
+      visibilityTimeout = setTimeout(async () => {
+        if (document.hidden || document.visibilityState === 'hidden') {
+          if (isPlaying) {
+            await safePause();
+            console.log('⏸️ Paused (app backgrounded)');
+          }
+        } else if (document.visibilityState === 'visible' && userHasInteracted && !isPlaying) {
+          // Đối với mobile, đợi thêm chút để app hoàn toàn active
+          setTimeout(async () => {
+            const success = await safePlay();
+            if (success) {
+              console.log('▶️ Resumed (app foregrounded)');
+            }
+          }, 200);
+        }
+      }, 150); // Tăng delay cho mobile
+    };
 
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', initAudio);
-    } else {
-      initAudio();
-    }
-
-    document.addEventListener('visibilitychange', () => {
-      if (document.hidden && !audio.paused) {
-        audio.pause();
-      } else if (!document.hidden && audioStarted) {
-        audio.play().catch(e => console.log('Resume failed:', e));
+    // Thêm xử lý cho mobile app lifecycle
+    const handlePageShow = () => {
+      console.log('📱 Page show event');
+      if (audioInitialized && userHasInteracted && !isPlaying) {
+        setTimeout(async () => {
+          await safePlay();
+        }, 300);
       }
+    };
+
+    const handlePageHide = () => {
+      console.log('📱 Page hide event');
+      if (isPlaying) {
+        safePause();
+      }
+    };
+
+    // Event listeners cho audio với enhanced feedback
+    audio.addEventListener('ended', playNextTrack);
+    
+    audio.addEventListener('loadstart', () => {
+      isLoading = true;
+      console.log('⬇️ Loading:', musicTracks[currentTrackIndex]?.name || 'Unknown');
+    });
+    
+    audio.addEventListener('loadeddata', () => {
+      console.log('📊 Data loaded');
+    });
+    
+    audio.addEventListener('canplay', () => {
+      isLoading = false;
+      console.log('▶️ Ready to play');
+    });
+    
+    audio.addEventListener('playing', () => {
+      isPlaying = true;
+      isLoading = false;
+      const track = musicTracks[currentTrackIndex];
+      console.log(`🎵 Now Playing: ${track.name} ${track.duration ? `(${Math.round(track.duration)}s)` : ''}`);
+    });
+    
+    audio.addEventListener('pause', () => {
+      isPlaying = false;
+    });
+    
+    audio.addEventListener('waiting', () => {
+      console.log('⏳ Buffering...');
+    });
+    
+    audio.addEventListener('error', (e) => {
+      isLoading = false;
+      const errorMsg = e.target.error?.message || 'Unknown error';
+      console.log('💥 Audio error:', errorMsg);
+      
+      // Auto retry with next track
+      setTimeout(() => {
+        console.log('🔄 Auto-retrying with next track...');
+        playNextTrack();
+      }, 1000);
     });
 
-    // Event listeners cho debug
-    audio.addEventListener('loadstart', () => console.log('Audio loading...'));
-    audio.addEventListener('canplay', () => console.log('Audio ready to play'));
-    audio.addEventListener('playing', () => console.log('Audio is playing'));
-    audio.addEventListener('error', (e) => console.log('Audio error:', e));
+    // Event listener cho visibility change và mobile events
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('pageshow', handlePageShow);
+    window.addEventListener('pagehide', handlePageHide);
+    
+    // Mobile-specific events
+    window.addEventListener('focus', handleVisibilityChange);
+    window.addEventListener('blur', () => {
+      if (isPlaying) safePause();
+    });
+
+    // Khởi tạo khi DOM ready với aggressive preloading
+    const init = () => {
+      console.log('🎼 Initializing high-speed audio system...');
+      
+      // Detect device và connection
+      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+      const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+      const isSlowConnection = connection && (connection.effectiveType === 'slow-2g' || connection.effectiveType === '2g');
+      
+      console.log(`📱 Device: ${isMobile ? 'Mobile' : 'Desktop'}${isIOS ? ' (iOS)' : ''}`);
+      if (connection) {
+        console.log(`🌐 Connection: ${connection.effectiveType} (${connection.downlink}Mbps)`);
+      }
+      
+      // Bắt đầu preload ngay lập tức nếu connection tốt
+      if (!isSlowConnection) {
+        console.log('🚀 Starting aggressive preload...');
+        setTimeout(() => preloadBatch(), 50);
+      } else {
+        console.log('🐌 Slow connection detected - conservative loading');
+        setTimeout(() => preloadTrack(0), 100);
+      }
+      
+      if (isIOS) {
+        // iOS yêu cầu tương tác mạnh hơn
+        console.log('🍎 iOS detected - interaction required');
+        setTimeout(() => {
+          if (!audioInitialized) addInteractionListeners();
+        }, 500);
+      } else {
+        // Thử autoplay với delay tối thiểu
+        setTimeout(attemptAutoplay, isMobile ? 150 : 50);
+      }
+      
+      // Fallback với timeout ngắn hơn
+      const fallbackTime = isMobile ? 1500 : 2000;
+      setTimeout(() => {
+        if (!audioInitialized && !autoplayAttempted) {
+          console.log('🔔 Tap anywhere to start music! 🎵');
+          addInteractionListeners();
+        }
+      }, fallbackTime);
+    };
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
   </script>
 </body>
 </html>
