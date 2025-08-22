@@ -2,11 +2,9 @@ import { Fragment, React } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { publicRoutes } from "./router";
 import DefaultLayout from "./layouts/DefaultLayout";
-import { SpeedInsights } from "@vercel/speed-insights/react"
 function App() {
   return (
     <Router>
-      <SpeedInsights />
       <Routes>
         {publicRoutes.map((route, index) => {
           const Page = route.component;
@@ -36,3 +34,4 @@ function App() {
 }
 
 export default App;
+
