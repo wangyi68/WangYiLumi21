@@ -9,17 +9,9 @@ function Footer() {
   useEffect(() => {
     const fetchIP = async () => {
       try {
-        const res = await fetch("https://www.cloudflare.com/cdn-cgi/trace");
-        const text = await res.text();
-
-        // parse kết quả: mỗi dòng dạng key=value
-        const data = Object.fromEntries(
-          text
-            .trim()
-            .split("\n")
-            .map((line) => line.split("="))
-        );
-
+        // ipify API
+        const res = await fetch("https://api.ipify.org?format=json");
+        const data = await res.json();
         setIp(data.ip || "Unknown");
       } catch (err) {
         console.error("Error fetching IP:", err);
