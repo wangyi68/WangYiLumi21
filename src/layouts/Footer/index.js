@@ -1,10 +1,8 @@
-// React Component: Footer.jsx
-
 import { useEffect, useState } from "react";
 import Tippy from "@tippyjs/react";
 import "tippy.js/animations/scale.css";
 import "tippy.js/dist/tippy.css";
-import { trackVisitor } from "../../api/visitorTracker";
+import { trackVisitor, getTotalViews } from "../../api/visitorTracker";
 
 function Footer() {
   const [ip, setIp] = useState("Loading...");
@@ -12,22 +10,35 @@ function Footer() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchIPAndTrack = async (retries = 3) => {
+    const fetchIPAndViews = async (retries = 3) => {
       try {
-        // Lấy IP
+        // Fetch IP
         const ipRes = await fetch("https://api.ipify.org?format=json");
+        if (!ipRes.ok) {
+          throw new Error("Failed to fetch IP");
+        }
         const ipData = await ipRes.json();
         setIp(ipData.ip || "Unknown");
 
-        // Track tổng view
-        const total = await trackVisitor();
+        // Check if visitor is new or returning
+        const visited = localStorage.getItem("visited") === "true";
+        let total;
+
+        if (!visited) {
+          // New visitor: track and increment views
+          total = await trackVisitor();
+        } else {
+          // Returning visitor: get total views without incrementing
+          total = await getTotalViews();
+        }
+
         setViews(total);
         setError(null);
       } catch (err) {
         console.error("Error:", err);
         if (retries > 0) {
           console.log(`Retrying... (${retries} attempts left)`);
-          setTimeout(() => fetchIPAndTrack(retries - 1), 1000);
+          setTimeout(() => fetchIPAndViews(retries - 1), 1000);
         } else {
           setIp("Unavailable");
           setViews(0);
@@ -36,7 +47,7 @@ function Footer() {
       }
     };
 
-    fetchIPAndTrack();
+    fetchIPAndViews();
   }, []);
 
   return (
@@ -75,7 +86,7 @@ function Footer() {
           </Tippy>
           <span className="text-neutral-500">IP: {ip}</span>
           <span className="text-neutral-500">
-            👁 {views !== null ? views : "Loading..."} View
+            👁 {views !== null ? views : "Loading..."} View{views !== 1 ? "s" : ""}
           </span>
           {error && <span className="text-red-500">{error}</span>}
         </p>
