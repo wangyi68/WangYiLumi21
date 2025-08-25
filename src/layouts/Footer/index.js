@@ -9,22 +9,23 @@ function Footer() {
   const [views, setViews] = useState(0);
 
   useEffect(() => {
-    const fetchIP = async () => {
+    const fetchIPAndTrack = async () => {
       try {
+        // Lấy IP
         const res = await fetch("https://api.ipify.org?format=json");
         const data = await res.json();
         setIp(data.ip || "Unknown");
 
-        // gọi hàm trackVisitor (chỉ localStorage)
-        const total = await trackVisitor(data.ip);
+        // Track tổng view toàn cầu
+        const total = await trackVisitor();
         setViews(total);
       } catch (err) {
-        console.error("Error fetching IP:", err);
+        console.error("Error:", err);
         setIp("Unavailable");
       }
     };
 
-    fetchIP();
+    fetchIPAndTrack();
   }, []);
 
   return (
