@@ -1,11 +1,9 @@
-// Frontend API Client: src/api/visitorTracker.js
+const API_URL = "https://viewapi-beta.vercel.app"; // Replace with your actual Vercel API URL
 
-const API_URL = process.env.REACT_APP_API_URL || "https://viewapi-beta.vercel.app";
-
-// Track visitor (tăng view nếu chưa visit)
+// Track visitor (increment view if new visitor)
 export async function trackVisitor() {
   try {
-    const visited = localStorage.getItem("visited");
+    const visited = localStorage.getItem("visited") === "true"; // Explicitly check for "true"
     const res = await fetch(`${API_URL}/api/track`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -25,14 +23,17 @@ export async function trackVisitor() {
     return data.total;
   } catch (err) {
     console.error("Error tracking visitor:", err);
-    throw err; // Ném lỗi để component xử lý
+    throw err; // Throw error to be handled by component
   }
 }
 
-// Lấy tổng view mà không tăng
+// Get total views without incrementing
 export async function getTotalViews() {
   try {
-    const res = await fetch(`${API_URL}/api/views`);
+    const res = await fetch(`${API_URL}/api/views`, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+    });
     if (!res.ok) {
       throw new Error(`HTTP error! Status: ${res.status}`);
     }
@@ -40,6 +41,6 @@ export async function getTotalViews() {
     return data.total;
   } catch (err) {
     console.error("Error getting total views:", err);
-    throw err; // Ném lỗi để component xử lý
+    throw err; // Throw error to be handled by component
   }
 }
