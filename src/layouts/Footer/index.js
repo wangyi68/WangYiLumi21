@@ -2,17 +2,22 @@ import { useEffect, useState } from "react";
 import Tippy from "@tippyjs/react";
 import "tippy.js/animations/scale.css";
 import "tippy.js/dist/tippy.css";
+import { trackVisitor } from "../../api/visitorTracker";
 
 function Footer() {
   const [ip, setIp] = useState("");
+  const [views, setViews] = useState(0);
 
   useEffect(() => {
     const fetchIP = async () => {
       try {
-        // ipify API
         const res = await fetch("https://api.ipify.org?format=json");
         const data = await res.json();
         setIp(data.ip || "Unknown");
+
+        // gọi hàm trackVisitor (chỉ localStorage)
+        const total = await trackVisitor(data.ip);
+        setViews(total);
       } catch (err) {
         console.error("Error fetching IP:", err);
         setIp("Unavailable");
@@ -45,7 +50,7 @@ function Footer() {
             Tailwind
           </a>
         </p>
-        <p className="flex gap-2 items-center justify-center">
+        <p className="flex gap-3 items-center justify-center">
           <Tippy animation="scale" content="我明白了">
             <a
               className="text-cyan-600"
@@ -57,6 +62,7 @@ function Footer() {
             </a>
           </Tippy>
           <span className="text-neutral-500">IP: {ip}</span>
+          <span className="text-neutral-500">👁 {views} View</span>
         </p>
       </div>
     </div>
