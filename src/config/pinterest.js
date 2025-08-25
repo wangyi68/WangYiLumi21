@@ -34,4 +34,11 @@ export const pinterest = [
     image: "https://i.pinimg.com/736x/b6/e8/64/b6e864655c3a810e3885cfbf422500e6.jpg",
     url: "https://i.pinimg.com/736x/b6/e8/64/b6e864655c3a810e3885cfbf422500e6.jpg",
   },
+  {
+    rank: 6,
+    name: "Pinterest Girl",
+    description: "无法翻译",
+    image: "https://i.pinimg.com/736x/ed/a0/8d/eda08db9030eabf6456dd9f81ad94ce5.jpg",
+    url: "https://i.pinimg.com/736x/ed/a0/8d/eda08db9030eabf6456dd9f81ad94ce5.jpg",
+  },
 ];
