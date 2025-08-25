@@ -1,21 +1,34 @@
-// Chỉ dùng localStorage để đếm view
-
-export async function trackVisitor(ip) {
+// Dùng API Node.js để track tổng view toàn cầu
+export async function trackVisitor() {
   try {
-    // Kiểm tra nếu đã vào rồi (trong cùng 1 phiên)
     const visited = localStorage.getItem("visited");
-    let total = parseInt(localStorage.getItem("totalViews") || "0", 10);
+    const res = await fetch("https://viewapi-cyan.vercel.app/api/track", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ newVisitor: !visited }),
+    });
+
+    const data = await res.json();
 
     if (!visited) {
-      // Lần đầu vào -> tăng view
-      total += 1;
-      localStorage.setItem("totalViews", total.toString());
       localStorage.setItem("visited", "true");
     }
 
-    return total;
+    return data.total;
   } catch (err) {
     console.error("Error tracking visitor:", err);
+    return 0;
+  }
+}
+
+// Nếu chỉ muốn check tổng view mà không tăng
+export async function getTotalViews() {
+  try {
+    const res = await fetch("https://viewapi-cyan.vercel.app/api/views");
+    const data = await res.json();
+    return data.total;
+  } catch (err) {
+    console.error("Error getting total views:", err);
     return 0;
   }
 }
