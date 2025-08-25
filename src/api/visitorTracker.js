@@ -1,8 +1,10 @@
-// Dùng API Node.js để track tổng view toàn cầu
+// src/api/visitorTracker.js
+
+// Track visitor (tăng view nếu chưa visit)
 export async function trackVisitor() {
   try {
     const visited = localStorage.getItem("visited");
-    const res = await fetch("https://viewapi-cyan.vercel.app/api/track", {
+    const res = await fetch("https://viewapi-beta.vercel.app/api/track", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ newVisitor: !visited }),
@@ -21,10 +23,10 @@ export async function trackVisitor() {
   }
 }
 
-// Nếu chỉ muốn check tổng view mà không tăng
+// Lấy tổng view mà không tăng
 export async function getTotalViews() {
   try {
-    const res = await fetch("https://viewapi-cyan.vercel.app/api/views");
+    const res = await fetch("https://viewapi-beta.vercel.app/api/track");
     const data = await res.json();
     return data.total;
   } catch (err) {
