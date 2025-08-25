@@ -26,7 +26,7 @@ export async function trackVisitor() {
 // Lấy tổng view mà không tăng
 export async function getTotalViews() {
   try {
-    const res = await fetch("https://viewapi-beta.vercel.app/api/track");
+    const res = await fetch("https://viewapi-beta.vercel.app/api/views");
     const data = await res.json();
     return data.total;
   } catch (err) {
