@@ -1,3 +1,5 @@
+// React Component: Footer.jsx
+
 import { useEffect, useState } from "react";
 import Tippy from "@tippyjs/react";
 import "tippy.js/animations/scale.css";
@@ -5,23 +7,32 @@ import "tippy.js/dist/tippy.css";
 import { trackVisitor } from "../../api/visitorTracker";
 
 function Footer() {
-  const [ip, setIp] = useState("");
-  const [views, setViews] = useState(0);
+  const [ip, setIp] = useState("Loading...");
+  const [views, setViews] = useState(null);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchIPAndTrack = async () => {
+    const fetchIPAndTrack = async (retries = 3) => {
       try {
         // Lấy IP
-        const res = await fetch("https://api.ipify.org?format=json");
-        const data = await res.json();
-        setIp(data.ip || "Unknown");
+        const ipRes = await fetch("https://api.ipify.org?format=json");
+        const ipData = await ipRes.json();
+        setIp(ipData.ip || "Unknown");
 
-        // Track tổng view toàn cầu
+        // Track tổng view
         const total = await trackVisitor();
         setViews(total);
+        setError(null);
       } catch (err) {
         console.error("Error:", err);
-        setIp("Unavailable");
+        if (retries > 0) {
+          console.log(`Retrying... (${retries} attempts left)`);
+          setTimeout(() => fetchIPAndTrack(retries - 1), 1000);
+        } else {
+          setIp("Unavailable");
+          setViews(0);
+          setError("Failed to load data");
+        }
       }
     };
 
@@ -63,7 +74,10 @@ function Footer() {
             </a>
           </Tippy>
           <span className="text-neutral-500">IP: {ip}</span>
-          <span className="text-neutral-500">👁 {views} View</span>
+          <span className="text-neutral-500">
+            👁 {views !== null ? views : "Loading..."} View
+          </span>
+          {error && <span className="text-red-500">{error}</span>}
         </p>
       </div>
     </div>
